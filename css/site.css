@@ -1,0 +1,285 @@
+/* =========================================
+   Codex: Journal of Cyphernetics
+   Site-wide styles
+   ========================================= */
+
+/* --- Fonts --- */
+
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap');
+
+/* --- Reset & Base --- */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #111;
+    background-color: #fafafa;
+    margin: 0;
+    padding: 0;
+}
+
+/* --- Layout --- */
+
+.site-container {
+    max-width: 50rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+/* --- Masthead --- */
+
+.site-header {
+    text-align: center;
+    padding: 2.5rem 0 1.5rem 0;
+}
+
+.masthead-container {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+}
+
+.masthead-bg {
+    font-family: 'IBM Plex Mono', 'Courier New', monospace;
+    font-size: 0.5rem;
+    line-height: 1.0;
+    color: #d0d0d0;
+    margin: 0;
+    display: block;
+    text-align: left;
+    letter-spacing: 0;
+    pointer-events: none;
+    user-select: none;
+}
+
+.ascii-masthead {
+    font-family: 'IBM Plex Mono', 'Courier New', monospace;
+    font-size: 0.55rem;
+    line-height: 1.15;
+    color: #000;
+    margin: 0;
+    display: block;
+    text-align: center;
+    letter-spacing: -0.02em;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+}
+
+.site-subtitle {
+    font-family: 'EB Garamond', 'Georgia', serif;
+    font-size: 1.05rem;
+    font-style: italic;
+    color: #555;
+    margin: 0;
+    font-weight: 400;
+}
+
+/* --- Navigation --- */
+
+.site-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-top: 1px dotted #000;
+    border-bottom: 1px dotted #000;
+    margin-bottom: 2.5rem;
+}
+
+.site-nav a {
+    color: #000;
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.site-nav a:hover {
+    color: #2ecc87;
+}
+
+.nav-home {
+    font-weight: 700;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+/* --- Typography --- */
+
+h1, h2, h3 {
+    font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
+    font-weight: 400;
+    line-height: 1.3;
+    color: #000;
+}
+
+h1 {
+    font-size: 1.4rem;
+}
+
+h2 {
+    font-size: 1.1rem;
+    letter-spacing: 0.02em;
+}
+
+h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+a {
+    color: #2ecc87;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+p {
+    margin: 0 0 1.4em 0;
+}
+
+/* --- Dividers --- */
+
+hr {
+    border: none;
+    border-top: 1px dotted #999;
+    margin: 2rem 0;
+}
+
+/* --- Essay Listing (Index Page) --- */
+
+.essay-listing {
+    padding: 1rem 0;
+}
+
+.essay-listing-label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 1.5rem;
+}
+
+.essay-entry {
+    padding: 1.2rem 0;
+    border-bottom: 1px dotted #ccc;
+}
+
+.essay-entry:first-of-type {
+    border-top: 1px dotted #ccc;
+}
+
+.essay-entry-title {
+    font-family: 'EB Garamond', 'Georgia', serif;
+    font-size: 1.25rem;
+    line-height: 1.4;
+    margin: 0 0 0.3rem 0;
+}
+
+.essay-entry-title a {
+    color: #111;
+}
+
+.essay-entry-title a:hover {
+    color: #2ecc87;
+}
+
+.essay-entry-meta {
+    font-size: 11px;
+    color: #888;
+    letter-spacing: 0.02em;
+}
+
+/* --- Footer --- */
+
+.site-footer {
+    border-top: 1px dotted #000;
+    margin-top: 4rem;
+    padding: 1.2rem 0 2rem 0;
+    font-size: 11px;
+    color: #888;
+    text-align: center;
+    letter-spacing: 0.04em;
+}
+
+/* --- Metadata --- */
+
+.meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: #888;
+    letter-spacing: 0.02em;
+}
+
+/* --- Binding Stitches (side margins) --- */
+
+.binding-left,
+.binding-right {
+    position: fixed;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    line-height: 1.4;
+    color: #d0d0d0;
+    white-space: pre;
+    pointer-events: none;
+    user-select: none;
+    z-index: -1;
+}
+
+.binding-left {
+    left: 2.5rem;
+    text-align: right;
+}
+
+.binding-right {
+    right: 2.5rem;
+    text-align: left;
+}
+
+/* --- Responsive --- */
+
+@media (max-width: 1200px) {
+    .binding-left,
+    .binding-right {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .site-container {
+        padding: 1rem;
+    }
+
+    .site-nav {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .site-header {
+        padding: 2rem 0 1.5rem 0;
+    }
+
+    .ascii-masthead {
+        font-size: 0.4rem;
+    }
+
+    h1 {
+        font-size: 1.2rem;
+    }
+}
