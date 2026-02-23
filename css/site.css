@@ -203,6 +203,27 @@ hr {
     letter-spacing: 0.02em;
 }
 
+/* --- Bottom Art --- */
+
+.bottom-art {
+    margin-top: 3rem;
+    text-align: center;
+    overflow: hidden;
+}
+
+.bottom-art-pre {
+    font-family: 'IBM Plex Mono', 'Courier New', monospace;
+    font-size: 0.5rem;
+    line-height: 1.0;
+    color: #ccc;
+    margin: 0;
+    display: inline-block;
+    text-align: left;
+    letter-spacing: 0;
+    pointer-events: none;
+    user-select: none;
+}
+
 /* --- Footer --- */
 
 .site-footer {
@@ -233,22 +254,24 @@ hr {
     height: 100vh;
     overflow: hidden;
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    line-height: 1.4;
-    color: #d0d0d0;
+    font-size: 9px;
+    line-height: 1.2;
+    color: #888;
     white-space: pre;
     pointer-events: none;
     user-select: none;
     z-index: -1;
+    display: flex;
+    align-items: center;
 }
 
 .binding-left {
-    left: 2.5rem;
+    left: 1rem;
     text-align: right;
 }
 
 .binding-right {
-    right: 2.5rem;
+    right: 1rem;
     text-align: left;
 }
 

@@ -11,6 +11,17 @@
     border-bottom: 1px dotted #ccc;
 }
 
+.essay-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.essay-header-meta {
+    flex: 1;
+}
+
 .essay-title {
     font-family: 'EB Garamond', 'Georgia', serif;
     font-size: 1.8rem;
@@ -192,6 +203,10 @@
 /* --- Responsive --- */
 
 @media (max-width: 600px) {
+    .essay-header-row img {
+        display: none;
+    }
+
     .essay-title {
         font-size: 1.4rem;
     }
