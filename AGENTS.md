@@ -1,16 +1,27 @@
 # Agent Instructions
 
-This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get started.
+This project uses **bd** (beads) for issue tracking.
+
+## Session Start
+
+1. Run `bd prime` to load the beads workflow context
+2. Run `bd ready` to see available work
+3. Check `docs/plans/` for any active implementation plans
 
 ## Quick Reference
 
 ```bash
+bd prime              # Load workflow context (run at session start)
 bd ready              # Find available work
 bd show <id>          # View issue details
 bd update <id> --status in_progress  # Claim work
 bd close <id>         # Complete work
 bd sync               # Sync with git
 ```
+
+## Plans
+
+When creating an implementation plan, copy it into the repository at `docs/plans/<descriptive-name>.md` and commit it. Plans live in the repo so other agents and sessions can find them. Reference the relevant beads issue IDs in the plan.
 
 ## Landing the Plane (Session Completion)
 
