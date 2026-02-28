@@ -341,8 +341,7 @@ hr {
     max-width: 60%;
     height: auto;
     opacity: 0.2;
-    filter: grayscale(100%) brightness(1.2);
-    mix-blend-mode: multiply;
+    filter: grayscale(100%) brightness(1.2) contrast(0.8);
     pointer-events: none;
     user-select: none;
 }
