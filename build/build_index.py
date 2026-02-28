@@ -18,6 +18,8 @@ DEFAULT_OUTPUT = PROJECT_ROOT / "index.html"
 DEFAULT_FEEDS_CONFIG = PROJECT_ROOT / "_data" / "feeds.json"
 DEFAULT_FEEDS_TEMPLATE = PROJECT_ROOT / "build" / "feeds-template.html"
 DEFAULT_FEEDS_OUTPUT = PROJECT_ROOT / "feeds.html"
+DEFAULT_ESSAYS_TEMPLATE = PROJECT_ROOT / "build" / "essays-template.html"
+DEFAULT_ESSAYS_OUTPUT = PROJECT_ROOT / "essays.html"
 
 
 def load_essays(path):
@@ -324,6 +326,10 @@ def main():
                         help="Feeds page output path")
     parser.add_argument("--feeds-template", type=Path, default=DEFAULT_FEEDS_TEMPLATE,
                         help="Feeds page template path")
+    parser.add_argument("--essays-template", type=Path, default=DEFAULT_ESSAYS_TEMPLATE,
+                        help="Essays page template path")
+    parser.add_argument("--essays-output", type=Path, default=DEFAULT_ESSAYS_OUTPUT,
+                        help="Essays page output path")
     parser.add_argument("--max-preview", type=int, default=5,
                         help="Max items in index activity preview")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT, help="Index output path")
@@ -334,6 +340,11 @@ def main():
     template = args.template.read_text()
     essays = load_essays(args.essays)
     essay_html = render_essay_entries(essays)
+
+    # Render essays page
+    essays_template = args.essays_template.read_text()
+    essays_page_html = essays_template.replace("{{ESSAY_ENTRIES}}", essay_html)
+    write_output(essays_page_html, args.essays_output)
 
     if args.no_feed:
         activity_html = ""
