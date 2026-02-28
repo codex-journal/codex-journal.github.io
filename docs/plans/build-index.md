@@ -1,5 +1,7 @@
 # Plan: build_index.py — Static Index Generator
 
+**Beads:** `codex-ncm` (essay registry + index generator), `codex-k7y` (GitHub activity feed)
+
 ## Context
 
 The Codex Journal index page is currently hand-edited HTML with placeholder essay entries (`[Title]`, `[Author]`). We want a Python script that generates `index.html` from two data sources: an essay registry (`_data/essays.json`) and the GitHub org Atom feed (`https://github.com/codex-journal.atom`). This makes the landing page a build artifact — rebuilt daily by a cron Action, or on-demand after an essay publish.
