@@ -1,0 +1,20 @@
+{
+  "feeds": [
+    {
+      "id": "codex-journal",
+      "group": "Codex Journal",
+      "url": "https://github.com/codex-journal.atom",
+      "max_items": 10,
+      "filter_exclude": ["beads-sync", "bd sync"],
+      "active": true
+    },
+    {
+      "id": "nesbitt",
+      "group": "Source Engineering",
+      "url": "https://nesbitt.io/feed.xml",
+      "max_items": 10,
+      "filter_exclude": [],
+      "active": true
+    }
+  ]
+}

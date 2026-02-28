@@ -203,6 +203,119 @@ hr {
     letter-spacing: 0.02em;
 }
 
+/* --- Activity Feed (Index Page) --- */
+
+.activity-feed {
+    padding: 1rem 0;
+}
+
+.activity-feed summary {
+    cursor: pointer;
+    list-style: none;
+}
+
+.activity-feed summary::-webkit-details-marker {
+    display: none;
+}
+
+.activity-feed summary:hover .activity-feed-label {
+    color: #7d9bca;
+}
+
+.activity-feed summary .activity-feed-toggle::after {
+    content: " +";
+}
+
+.activity-feed[open] summary .activity-feed-toggle::after {
+    content: " \2212";
+}
+
+.activity-feed-label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 1.5rem;
+    display: inline;
+}
+
+.activity-feed-toggle {
+    color: #ccc;
+    font-size: 10px;
+}
+
+.activity-entry {
+    padding: 0.8rem 0;
+    border-bottom: 1px dotted #ccc;
+}
+
+.activity-entry:first-of-type {
+    border-top: 1px dotted #ccc;
+}
+
+.activity-entry-title {
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0 0 0.2rem 0;
+}
+
+.activity-entry-title a {
+    color: #111;
+}
+
+.activity-entry-title a:hover {
+    color: #7d9bca;
+}
+
+.activity-entry-meta {
+    font-size: 11px;
+    color: #888;
+    letter-spacing: 0.02em;
+}
+
+.activity-more {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 1rem;
+}
+
+.activity-more a {
+    color: #999;
+}
+
+.activity-more a:hover {
+    color: #7d9bca;
+}
+
+/* --- Feed Sources (Feeds Page) --- */
+
+.feed-source {
+    padding: 1rem 0;
+    margin-bottom: 1.5rem;
+}
+
+.feed-source-label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 1.5rem;
+}
+
+.feed-subtitle {
+    font-size: 11px;
+    color: #888;
+    letter-spacing: 0.02em;
+    margin: 1.5rem 0 0.5rem 0;
+}
+
+.feed-empty {
+    font-size: 13px;
+    color: #999;
+    font-style: italic;
+}
+
 /* --- Bottom Art --- */
 
 .bottom-art {
@@ -220,6 +333,16 @@ hr {
     display: inline-block;
     text-align: left;
     letter-spacing: 0;
+    pointer-events: none;
+    user-select: none;
+}
+
+.bottom-art-img {
+    max-width: 60%;
+    height: auto;
+    opacity: 0.2;
+    filter: grayscale(100%) brightness(1.2);
+    mix-blend-mode: multiply;
     pointer-events: none;
     user-select: none;
 }
