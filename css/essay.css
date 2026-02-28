@@ -64,7 +64,7 @@
 }
 
 .essay-meta a:hover {
-    color: #2ecc87;
+    color: #7d9bca;
 }
 
 /* --- Essay Body --- */
@@ -176,8 +176,8 @@
 }
 
 .essay-body a[role="doc-biblioref"]:hover {
-    color: #2ecc87;
-    border-bottom-color: #2ecc87;
+    color: #7d9bca;
+    border-bottom-color: #7d9bca;
 }
 
 /* --- Download Link --- */
@@ -196,8 +196,8 @@
 }
 
 .essay-download a:hover {
-    color: #2ecc87;
-    border-bottom-color: #2ecc87;
+    color: #7d9bca;
+    border-bottom-color: #7d9bca;
 }
 
 /* --- Responsive --- */
