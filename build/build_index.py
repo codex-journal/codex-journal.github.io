@@ -119,6 +119,7 @@ def fetch_feed(config, timeout=10):
     max_items = config.get("max_items", 10)
     filter_terms = [t.lower() for t in config.get("filter_exclude", [])]
     source_id = config["id"]
+    source_group = config.get("group", "")
     fallback_name = config.get("name", source_id)
 
     try:
@@ -155,6 +156,7 @@ def fetch_feed(config, timeout=10):
         entry["published"] = normalize_date(entry["published"])
         entry["source_id"] = source_id
         entry["source_name"] = source_name
+        entry["source_group"] = source_group
         entry["source_site"] = site_url
         entries.append(entry)
         if len(entries) >= max_items:
@@ -208,19 +210,24 @@ def _site_label(url):
     return host
 
 
-def render_activity_entry(entry, show_source=False):
-    """Render a single activity entry div."""
+def render_activity_entry(entry, show_source=False, show_site=False):
+    """Render a single activity entry div.
+
+    show_source: include group name (for index preview)
+    show_site: include site domain (for feeds page)
+    """
     title = entry.get("title", "")
     link = entry.get("link", "")
     published = entry.get("published", "")
-    source_name = entry.get("source_name", "")
+    source_group = entry.get("source_group", "")
     source_site = entry.get("source_site", "")
     meta_parts = [published]
-    if show_source and source_name:
-        meta_parts.append(source_name)
-    site_label = _site_label(source_site)
-    if site_label:
-        meta_parts.append(site_label)
+    if show_source and source_group:
+        meta_parts.append(source_group)
+    if show_site:
+        site_label = _site_label(source_site)
+        if site_label:
+            meta_parts.append(site_label)
     meta = " &middot; ".join(p for p in meta_parts if p)
     return (
         f'            <div class="activity-entry">\n'
@@ -279,7 +286,7 @@ def render_feeds_sections(feeds_by_id, feeds_config, names_by_id):
                 items_parts.append(
                     f'            <p class="feed-subtitle">{feed_name}</p>'
                 )
-            items_parts.extend(render_activity_entry(e) for e in entries)
+            items_parts.extend(render_activity_entry(e, show_site=True) for e in entries)
         items_html = "\n\n".join(items_parts)
 
         sections.append(
