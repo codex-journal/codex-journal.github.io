@@ -236,6 +236,22 @@ hr {
     letter-spacing: 0.04em;
 }
 
+.footer-links {
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.footer-links a {
+    color: #888;
+    text-decoration: none;
+}
+
+.footer-links a:hover {
+    color: #2ecc87;
+}
+
 /* --- Metadata --- */
 
 .meta {
