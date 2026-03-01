@@ -1,0 +1,77 @@
+name: Publish Essay
+
+on:
+  workflow_dispatch:
+    inputs:
+      essay_id:
+        description: "Essay directory name (e.g. source_engineering_intellectual_production_after_history)"
+        required: true
+        type: string
+      lineage:
+        description: "Knots lineage name"
+        required: true
+        type: string
+      snapshot_name:
+        description: "Knots snapshot name"
+        required: true
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout site
+        uses: actions/checkout@v4
+
+      - name: Fetch publish ref
+        env:
+          DEPLOY_KEY: ${{ secrets.SOURCE_ENGINEERING_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$DEPLOY_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no"
+
+          PUBLISH_REF="refs/knots/publish/${{ inputs.lineage }}/${{ inputs.snapshot_name }}"
+          PUBLISH_DIR="$(mktemp -d)"
+          echo "PUBLISH_DIR=$PUBLISH_DIR" >> "$GITHUB_ENV"
+
+          git init "$PUBLISH_DIR"
+          cd "$PUBLISH_DIR"
+          git remote add source git@github.com:codex-journal/source_engineering.git
+          git fetch --depth=1 source "$PUBLISH_REF"
+          git checkout FETCH_HEAD
+
+      - name: Install Pandoc
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq pandoc
+
+      - name: Compile essay
+        run: |
+          python build/compile_essay.py "$PUBLISH_DIR" "${{ inputs.essay_id }}" \
+            --version "${{ inputs.snapshot_name }}"
+
+      - name: Update registry
+        run: |
+          python build/update_registry.py "$PUBLISH_DIR" "${{ inputs.essay_id }}" \
+            --version "${{ inputs.snapshot_name }}"
+
+      - name: Rebuild index
+        run: python build/build_index.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "essays/${{ inputs.essay_id }}/" "_data/essays.json" index.html essays.html feeds.html
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "Publish ${{ inputs.essay_id }} (${{ inputs.snapshot_name }})"
+          git push
+
+      - name: Cleanup
+        if: always()
+        run: rm -rf "$PUBLISH_DIR" ~/.ssh/deploy_key
