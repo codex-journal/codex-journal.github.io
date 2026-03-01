@@ -51,14 +51,10 @@ jobs:
           sudo apt-get install -y -qq pandoc
 
       - name: Compile essay
-        run: |
-          python build/compile_essay.py "$PUBLISH_DIR" "${{ inputs.essay_id }}" \
-            --version "${{ inputs.snapshot_name }}"
+        run: python build/compile_essay.py "$PUBLISH_DIR" "${{ inputs.essay_id }}"
 
       - name: Update registry
-        run: |
-          python build/update_registry.py "$PUBLISH_DIR" "${{ inputs.essay_id }}" \
-            --version "${{ inputs.snapshot_name }}"
+        run: python build/update_registry.py "$PUBLISH_DIR" "${{ inputs.essay_id }}"
 
       - name: Rebuild index
         run: python build/build_index.py
