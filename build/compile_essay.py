@@ -98,6 +98,8 @@ def main():
 
     # Ensure output directory exists
     output_dir = repo_root / "essays" / args.essay_id
+    if version:
+        output_dir = output_dir / version
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / "index.html"
 

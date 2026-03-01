@@ -5,7 +5,7 @@ Usage:
     python build/update_registry.py <publish-dir> <essay-id> [--version v1.0]
 
 Reads manifest.json from a checked-out knots publish ref, extracts frontmatter,
-and writes/updates the essay entry in the registry.
+and writes/updates the essay entry in the registry. Tracks all versions per essay.
 """
 
 import argparse
@@ -49,10 +49,11 @@ def main():
         author = ", ".join(str(a) for a in author_raw)
     else:
         author = str(author_raw)
-    date = fm.get("date", "")
     version = args.version or manifest.get("name", "")
+    published_at = manifest.get("published_at", "")
 
     link = f"/essays/{args.essay_id}/"
+    version_link = f"/essays/{args.essay_id}/{version}/" if version else link
 
     # Load registry
     registry_path = args.registry
@@ -64,38 +65,58 @@ def main():
 
     essays = registry.get("essays", [])
 
-    # Find existing entry by link
+    # Find existing entry by id
     existing = None
     for entry in essays:
-        if entry.get("link") == link:
+        if entry.get("id") == args.essay_id:
             existing = entry
             break
 
     if existing:
-        changes = []
-        for field, value in [("title", title), ("author", author),
-                             ("current_version", version),
-                             ("published_date", date)]:
-            if value and existing.get(field) != value:
-                changes.append(f"  {field}: {existing.get(field)!r} -> {value!r}")
-                existing[field] = value
-        if changes:
-            print(f"Updated {args.essay_id}:")
-            for c in changes:
-                print(c)
-        else:
-            print(f"No changes for {args.essay_id}")
+        versions = existing.get("versions", [])
+
+        # Check if this version already registered (immutable)
+        for v in versions:
+            if v.get("version") == version:
+                print(f"{args.essay_id} {version} already registered, skipping")
+                return
+
+        # Append new version
+        versions.append({
+            "version": version,
+            "published_at": published_at,
+            "link": version_link,
+        })
+
+        # Sort by published_at descending
+        versions.sort(key=lambda v: v.get("published_at", ""), reverse=True)
+        existing["versions"] = versions
+
+        # Recompute top-level fields from latest version
+        latest = versions[0]
+        existing["current_version"] = latest["version"]
+        existing["published_date"] = latest["published_at"]
+        existing["title"] = title
+        existing["author"] = author
+
+        print(f"Added {version} to {args.essay_id} ({len(versions)} versions)")
     else:
+        version_entry = {
+            "version": version,
+            "published_at": published_at,
+            "link": version_link,
+        }
         new_entry = {
             "id": args.essay_id,
             "title": title,
             "author": author,
             "current_version": version,
-            "published_date": date,
+            "published_date": published_at,
             "link": link,
+            "versions": [version_entry],
         }
         essays.append(new_entry)
-        print(f"Added new entry: {args.essay_id}")
+        print(f"Added new entry: {args.essay_id} {version}")
 
     registry["essays"] = essays
     with open(registry_path, "w") as f:

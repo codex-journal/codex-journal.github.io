@@ -67,6 +67,78 @@
     color: #7d9bca;
 }
 
+/* --- Version Nav --- */
+
+#essay-versions {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    margin-top: 0.8rem;
+}
+
+.version-dropdown {
+    display: inline-block;
+    position: relative;
+}
+
+.version-toggle {
+    cursor: pointer;
+    color: #888;
+    border-bottom: 1px dotted #bbb;
+    list-style: none;
+}
+
+.version-toggle::-webkit-details-marker {
+    display: none;
+}
+
+.version-toggle::after {
+    content: ' \25BE';
+    font-size: 9px;
+}
+
+.version-dropdown[open] .version-toggle {
+    color: #333;
+}
+
+.version-list {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    margin: 0.3rem 0 0 0;
+    padding: 0.4rem 0;
+    list-style: none;
+    padding-left: 0;
+    background: #fff;
+    border: 1px dotted #ccc;
+    z-index: 10;
+    min-width: 10rem;
+}
+
+.version-list li a {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5em;
+    padding: 0.3rem 0.8rem;
+    color: #888;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.version-list li a:hover {
+    color: #7d9bca;
+    background: #f8f8f8;
+}
+
+.version-list li a.version-current {
+    color: #333;
+}
+
+.version-date {
+    color: #bbb;
+    font-size: 10px;
+}
+
 /* --- Essay Body --- */
 
 .essay-body {

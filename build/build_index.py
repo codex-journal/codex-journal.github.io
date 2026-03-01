@@ -188,6 +188,8 @@ def render_essay_entries(essays):
         author = essay.get("author", "")
         version = essay.get("current_version", "")
         date = essay.get("published_date", "")
+        if "T" in date:
+            date = date.split("T")[0]
         meta_parts = [p for p in [author, version, date] if p]
         meta = " &middot; ".join(meta_parts)
         parts.append(

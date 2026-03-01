@@ -18,8 +18,12 @@
             beads
             pandoc
             ascii-image-converter
-            (python3.withPackages (ps: [ ps.pillow ]))
+            playwright-driver.browsers
+            (python3.withPackages (ps: [ ps.pillow ps.pytest ps.playwright ]))
           ];
+          shellHook = ''
+            export PLAYWRIGHT_BROWSERS_PATH="${pkgs.playwright-driver.browsers}"
+          '';
         };
       });
     };

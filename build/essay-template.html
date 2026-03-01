@@ -14,6 +14,9 @@
     <style>
         .essay-header {
             position: relative;
+        }
+        .essay-header-inner {
+            position: relative;
             overflow: hidden;
         }
         .essay-header-captcha {
@@ -61,17 +64,20 @@
 
         <article class="essay">
             <header class="essay-header">
-                <img src="/resources/captcha-codex-journal.jpg" alt="" aria-hidden="true" class="essay-header-captcha">
-                <h1 class="essay-title">$title$</h1>
-                <div class="essay-meta">
-                    <span>$for(author)$$author$$sep$, $endfor$</span>
+                <div class="essay-header-inner">
+                    <img src="/resources/captcha-codex-journal.jpg" alt="" aria-hidden="true" class="essay-header-captcha">
+                    <h1 class="essay-title">$title$</h1>
+                    <div class="essay-meta">
+                        <span>$for(author)$$author$$sep$, $endfor$</span>
 $if(version)$
-                    <span>$version$</span>
+                        <span>$version$</span>
 $endif$
 $if(date)$
-                    <span>$date$</span>
+                        <span>$date$</span>
 $endif$
+                    </div>
                 </div>
+                <nav id="essay-versions"></nav>
             </header>
 
             <div class="essay-body">
@@ -88,5 +94,6 @@ $body$
         </div>
     </div>
 <script src="/js/sidebars.js"></script>
+<script src="/js/versions.js"></script>
 </body>
 </html>
