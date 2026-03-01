@@ -89,23 +89,18 @@ def essay_site(tmp_path_factory):
         (d / "essay.md").write_text(f"Content for {version}.\n")
 
     # Compile both versions into site_dir
-    essay_dir = site_dir / "essays" / "test_essay"
+    essays_dir = site_dir / "essays"
+    essay_dir = essays_dir / "test_essay"
     for version in ["v1.0", "v1.1"]:
         result = subprocess.run(
             [sys.executable, str(BUILD_DIR / "compile_essay.py"),
              str(site_dir / "publish" / version), "test_essay",
-             "--version", version],
+             "--version", version,
+             "--output-dir", str(essays_dir)],
             capture_output=True, text=True,
-            env={**__import__("os").environ,
-                 "PYTHONPATH": str(BUILD_DIR.parent)},
         )
         if result.returncode != 0:
             pytest.skip(f"compile failed: {result.stderr}")
-        # Move output to site_dir
-        compiled = Path(result.stdout.strip())
-        dest = essay_dir / version / "index.html"
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(compiled.read_text())
 
     # Copy latest to root
     import shutil
@@ -125,7 +120,6 @@ def essay_site(tmp_path_factory):
 
     # Also create a single-version essay
     single_dir = site_dir / "essays" / "single_essay"
-    single_dir.mkdir(parents=True)
     d = site_dir / "publish" / "solo"
     d.mkdir(parents=True, exist_ok=True)
     manifest = {
@@ -146,15 +140,13 @@ def essay_site(tmp_path_factory):
     (d / "essay.md").write_text("Solo content.\n")
     result = subprocess.run(
         [sys.executable, str(BUILD_DIR / "compile_essay.py"),
-         str(d), "single_essay", "--version", "v1.0"],
+         str(d), "single_essay", "--version", "v1.0",
+         "--output-dir", str(essays_dir)],
         capture_output=True, text=True,
     )
     if result.returncode == 0:
-        compiled = Path(result.stdout.strip())
-        dest = single_dir / "v1.0" / "index.html"
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(compiled.read_text())
-        shutil.copy2(str(dest), str(single_dir / "index.html"))
+        shutil.copy2(str(single_dir / "v1.0" / "index.html"),
+                     str(single_dir / "index.html"))
     (single_dir / "versions.json").write_text(json.dumps({
         "versions": [
             {"version": "v1.0", "published_at": "2026-03-01T00:00:00Z",

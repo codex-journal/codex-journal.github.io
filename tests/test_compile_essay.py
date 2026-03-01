@@ -20,52 +20,45 @@ def has_pandoc():
 needs_pandoc = pytest.mark.skipif(not has_pandoc(), reason="pandoc not available")
 
 
+def compile(publish_dir, essay_id, version=None, output_dir=None):
+    cmd = [sys.executable, str(BUILD_DIR / "compile_essay.py"),
+           str(publish_dir), essay_id]
+    if version:
+        cmd += ["--version", version]
+    if output_dir:
+        cmd += ["--output-dir", str(output_dir)]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    assert result.returncode == 0, f"compile failed: {result.stderr}"
+    return Path(result.stdout.strip())
+
+
 @needs_pandoc
 class TestVersionedOutput:
     def test_version_flag_creates_versioned_dir(self, tmp_publish_dir, tmp_path):
         d = tmp_publish_dir(version="v1.0")
-        result = subprocess.run(
-            [sys.executable, str(BUILD_DIR / "compile_essay.py"),
-             str(d), "test_essay", "--version", "v1.0"],
-            capture_output=True, text=True,
-        )
-        assert result.returncode == 0, f"compile failed: {result.stderr}"
-        output_path = Path(result.stdout.strip())
-        assert "/test_essay/v1.0/index.html" in str(output_path)
+        out = tmp_path / "out"
+        output_path = compile(d, "test_essay", "v1.0", out)
+        assert output_path == out / "test_essay" / "v1.0" / "index.html"
         assert output_path.exists()
 
-    def test_no_flag_uses_manifest_name(self, tmp_publish_dir):
+    def test_no_flag_uses_manifest_name(self, tmp_publish_dir, tmp_path):
         """Without --version, compile_essay uses manifest name as version."""
         d = tmp_publish_dir(version="v1.0")
-        result = subprocess.run(
-            [sys.executable, str(BUILD_DIR / "compile_essay.py"),
-             str(d), "test_essay_noversion"],
-            capture_output=True, text=True,
-        )
-        assert result.returncode == 0, f"compile failed: {result.stderr}"
-        output_path = Path(result.stdout.strip())
-        assert "/test_essay_noversion/v1.0/index.html" in str(output_path)
+        out = tmp_path / "out"
+        output_path = compile(d, "test_essay", output_dir=out)
+        assert output_path == out / "test_essay" / "v1.0" / "index.html"
 
-    def test_output_contains_title(self, tmp_publish_dir):
+    def test_output_contains_title(self, tmp_publish_dir, tmp_path):
         d = tmp_publish_dir(version="v1.0", title="My Great Essay")
-        result = subprocess.run(
-            [sys.executable, str(BUILD_DIR / "compile_essay.py"),
-             str(d), "test_essay_content", "--version", "v1.0"],
-            capture_output=True, text=True,
-        )
-        assert result.returncode == 0
-        output_path = Path(result.stdout.strip())
+        out = tmp_path / "out"
+        output_path = compile(d, "test_essay", "v1.0", out)
         html = output_path.read_text()
         assert "My Great Essay" in html
 
-    def test_output_contains_version_nav_placeholder(self, tmp_publish_dir):
+    def test_output_contains_version_nav_placeholder(self, tmp_publish_dir, tmp_path):
         d = tmp_publish_dir(version="v1.0")
-        result = subprocess.run(
-            [sys.executable, str(BUILD_DIR / "compile_essay.py"),
-             str(d), "test_essay_nav", "--version", "v1.0"],
-            capture_output=True, text=True,
-        )
-        assert result.returncode == 0
-        html = Path(result.stdout.strip()).read_text()
+        out = tmp_path / "out"
+        output_path = compile(d, "test_essay", "v1.0", out)
+        html = output_path.read_text()
         assert 'id="essay-versions"' in html
         assert "versions.js" in html

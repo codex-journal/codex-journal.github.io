@@ -28,6 +28,8 @@ def main():
     parser.add_argument("essay_id", help="Essay directory name")
     parser.add_argument("--version", dest="version",
                         help="Version label (default: manifest name)")
+    parser.add_argument("--output-dir", dest="output_dir", type=Path,
+                        help="Override output base directory")
     args = parser.parse_args()
 
     publish_dir = args.publish_dir.resolve()
@@ -97,7 +99,10 @@ def main():
         tmp_path = Path(tmp.name)
 
     # Ensure output directory exists
-    output_dir = repo_root / "essays" / args.essay_id
+    if args.output_dir:
+        output_dir = args.output_dir / args.essay_id
+    else:
+        output_dir = repo_root / "essays" / args.essay_id
     if version:
         output_dir = output_dir / version
     output_dir.mkdir(parents=True, exist_ok=True)
