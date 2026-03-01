@@ -62,3 +62,48 @@ class TestVersionedOutput:
         html = output_path.read_text()
         assert 'id="essay-versions"' in html
         assert "versions.js" in html
+
+
+@needs_pandoc
+class TestTableOfContents:
+    def _make_sectioned_essay(self, tmp_path):
+        """Create a publish dir with multiple top-level sections."""
+        d = tmp_path / "pub"
+        d.mkdir()
+        manifest = {
+            "name": "v1.0",
+            "published_at": "2026-02-28T00:00:00Z",
+            "documents": {
+                "writing/essay": {
+                    "frontmatter": {
+                        "title": "Sectioned Essay",
+                        "author": ["Author"],
+                        "date": "2026-02-28",
+                    },
+                    "artifacts": [{"path": "essay.md"}],
+                }
+            },
+        }
+        (d / "manifest.json").write_text(__import__("json").dumps(manifest))
+        (d / "essay.md").write_text(
+            "Intro.\n\n# First\n\nContent.\n\n# Second\n\nMore.\n"
+        )
+        return d
+
+    def test_toc_generated_with_sections(self, tmp_path):
+        d = self._make_sectioned_essay(tmp_path)
+        out = tmp_path / "out"
+        output_path = compile(d, "toc_essay", "v1.0", out)
+        html = output_path.read_text()
+        assert 'id="essay-toc"' in html
+        assert "First" in html
+        assert "Second" in html
+        assert 'class="toc-dropdown"' in html
+
+    def test_no_toc_without_sections(self, tmp_publish_dir, tmp_path):
+        """Default fixture has only ## headings which become H3, below toc-depth."""
+        d = tmp_publish_dir(version="v1.0")
+        out = tmp_path / "out"
+        output_path = compile(d, "notoc_essay", "v1.0", out)
+        html = output_path.read_text()
+        assert 'id="essay-toc"' not in html

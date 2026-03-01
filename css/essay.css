@@ -139,6 +139,62 @@
     font-size: 10px;
 }
 
+/* --- Table of Contents --- */
+
+#essay-toc {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    margin-bottom: 1.5rem;
+}
+
+.toc-dropdown {
+    display: inline-block;
+}
+
+.toc-toggle {
+    cursor: pointer;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 10px;
+    list-style: none;
+}
+
+.toc-toggle::-webkit-details-marker {
+    display: none;
+}
+
+.toc-toggle::after {
+    content: ' \25BE';
+    font-size: 9px;
+}
+
+.toc-dropdown[open] .toc-toggle {
+    color: #333;
+}
+
+#essay-toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0.5rem 0 0 0;
+}
+
+#essay-toc li {
+    margin-bottom: 0.3rem;
+}
+
+#essay-toc a {
+    color: #888;
+    text-decoration: none;
+    border-bottom: 1px dotted #bbb;
+}
+
+#essay-toc a:hover {
+    color: #7d9bca;
+    border-bottom-color: #7d9bca;
+}
+
 /* --- Essay Body --- */
 
 .essay-body {

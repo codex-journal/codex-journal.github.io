@@ -79,6 +79,14 @@ $endif$
                 </div>
                 <nav id="essay-versions"></nav>
             </header>
+$if(toc)$
+            <nav id="essay-toc">
+                <details class="toc-dropdown">
+                    <summary class="toc-toggle">contents</summary>
+                    $table-of-contents$
+                </details>
+            </nav>
+$endif$
 
             <div class="essay-body">
 $body$

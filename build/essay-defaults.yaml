@@ -3,6 +3,8 @@ to: html5
 standalone: true
 citeproc: true
 shift-heading-level-by: 1
+table-of-contents: true
+toc-depth: 2
 metadata:
   link-citations: true
   reference-section-title: References
