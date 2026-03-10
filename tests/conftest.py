@@ -12,19 +12,23 @@ def tmp_publish_dir(tmp_path):
     """Create a mock publish directory with manifest and essay markdown."""
 
     def _make(version="v1.0", published_at="2026-02-15T10:00:00Z",
-              title="Test Essay", author="Test Author", date="2026-02-15"):
+              title="Test Essay", author="Test Author", date="2026-02-15",
+              author_links=None):
         d = tmp_path / version
         d.mkdir()
+        frontmatter = {
+            "title": title,
+            "author": [author],
+            "date": date,
+        }
+        if author_links:
+            frontmatter["author-links"] = author_links
         manifest = {
             "name": version,
             "published_at": published_at,
             "documents": {
                 "writing/essay": {
-                    "frontmatter": {
-                        "title": title,
-                        "author": [author],
-                        "date": date,
-                    },
+                    "frontmatter": frontmatter,
                     "artifacts": [{"path": "essay.md"}],
                 }
             },

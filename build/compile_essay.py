@@ -73,7 +73,11 @@ def main():
     # Build YAML frontmatter block
     yaml_lines = ["---"]
     for key, value in frontmatter.items():
-        if isinstance(value, list):
+        if isinstance(value, dict):
+            yaml_lines.append(f"{key}:")
+            for k, v in value.items():
+                yaml_lines.append(f"  {k}: \"{_escape_yaml(str(v))}\"")
+        elif isinstance(value, list):
             yaml_lines.append(f"{key}:")
             for item in value:
                 yaml_lines.append(f"  - \"{_escape_yaml(str(item))}\"")

@@ -68,7 +68,7 @@
                     <img src="/resources/captcha-codex-journal.jpg" alt="" aria-hidden="true" class="essay-header-captcha">
                     <h1 class="essay-title">$title$</h1>
                     <div class="essay-meta">
-                        <span>$for(author)$$author$$sep$, $endfor$</span>
+                        <span>$for(author)$$author$$sep$, $endfor$$if(author-links)$$if(author-links.instagram)$ <a href="https://instagram.com/$author-links.instagram$">ig</a>$endif$$if(author-links.twitter)$ <a href="https://x.com/$author-links.twitter$">x</a>$endif$$endif$</span>
 $if(version)$
                         <span>$version$</span>
 $endif$

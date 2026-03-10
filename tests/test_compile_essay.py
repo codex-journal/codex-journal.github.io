@@ -55,6 +55,22 @@ class TestVersionedOutput:
         html = output_path.read_text()
         assert "My Great Essay" in html
 
+    def test_author_links_rendered(self, tmp_publish_dir, tmp_path):
+        d = tmp_publish_dir(version="v1.0", author_links={"instagram": "codexjournal", "twitter": "testhandle"})
+        out = tmp_path / "out"
+        output_path = compile(d, "test_essay", "v1.0", out)
+        html = output_path.read_text()
+        assert "instagram.com/codexjournal" in html
+        assert "x.com/testhandle" in html
+
+    def test_no_author_links_when_absent(self, tmp_publish_dir, tmp_path):
+        d = tmp_publish_dir(version="v1.0")
+        out = tmp_path / "out"
+        output_path = compile(d, "test_essay", "v1.0", out)
+        html = output_path.read_text()
+        assert "instagram.com" not in html
+        assert "x.com" not in html
+
     def test_output_contains_version_nav_placeholder(self, tmp_publish_dir, tmp_path):
         d = tmp_publish_dir(version="v1.0")
         out = tmp_path / "out"
