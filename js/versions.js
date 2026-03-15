@@ -1,8 +1,8 @@
 (function() {
   var path = location.pathname.replace(/\/index\.html$/, '/');
   var parts = path.split('/').filter(Boolean);
-  var essayRoot = '/essays/' + parts[1] + '/';
-  var currentVersion = parts.length > 2 ? parts[2] : null;
+  var essayRoot = '/' + parts[0] + '/';
+  var currentVersion = parts.length > 1 ? parts[1] : null;
 
   fetch(essayRoot + 'versions.json')
     .then(function(r) { return r.ok ? r.json() : null; })

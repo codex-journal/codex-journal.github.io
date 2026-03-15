@@ -33,7 +33,7 @@ class TestLsRemoteVersions:
 
 class TestAlreadyCompiled:
     def test_returns_true_when_exists(self, tmp_path):
-        essay_dir = tmp_path / "essays" / "test_essay" / "v1.0"
+        essay_dir = tmp_path / "test_essay" / "v1.0"
         essay_dir.mkdir(parents=True)
         (essay_dir / "index.html").write_text("<html></html>")
         with patch("sync_lineage.PROJECT_ROOT", tmp_path):

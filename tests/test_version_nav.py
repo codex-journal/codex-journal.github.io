@@ -89,14 +89,13 @@ def essay_site(tmp_path_factory):
         (d / "essay.md").write_text(f"Content for {version}.\n")
 
     # Compile both versions into site_dir
-    essays_dir = site_dir / "essays"
-    essay_dir = essays_dir / "test_essay"
+    essay_dir = site_dir / "test_essay"
     for version in ["v1.0", "v1.1"]:
         result = subprocess.run(
             [sys.executable, str(BUILD_DIR / "compile_essay.py"),
              str(site_dir / "publish" / version), "test_essay",
              "--version", version,
-             "--output-dir", str(essays_dir)],
+             "--output-dir", str(site_dir)],
             capture_output=True, text=True,
         )
         if result.returncode != 0:
@@ -111,15 +110,15 @@ def essay_site(tmp_path_factory):
     versions_data = {
         "versions": [
             {"version": "v1.1", "published_at": "2026-02-28T14:00:00Z",
-             "link": "/essays/test_essay/v1.1/"},
+             "link": "/test_essay/v1.1/"},
             {"version": "v1.0", "published_at": "2026-02-15T10:00:00Z",
-             "link": "/essays/test_essay/v1.0/"},
+             "link": "/test_essay/v1.0/"},
         ]
     }
     (essay_dir / "versions.json").write_text(json.dumps(versions_data))
 
     # Also create a single-version essay
-    single_dir = site_dir / "essays" / "single_essay"
+    single_dir = site_dir / "single_essay"
     d = site_dir / "publish" / "solo"
     d.mkdir(parents=True, exist_ok=True)
     manifest = {
@@ -141,7 +140,7 @@ def essay_site(tmp_path_factory):
     result = subprocess.run(
         [sys.executable, str(BUILD_DIR / "compile_essay.py"),
          str(d), "single_essay", "--version", "v1.0",
-         "--output-dir", str(essays_dir)],
+         "--output-dir", str(site_dir)],
         capture_output=True, text=True,
     )
     if result.returncode == 0:
@@ -150,7 +149,7 @@ def essay_site(tmp_path_factory):
     (single_dir / "versions.json").write_text(json.dumps({
         "versions": [
             {"version": "v1.0", "published_at": "2026-03-01T00:00:00Z",
-             "link": "/essays/single_essay/v1.0/"},
+             "link": "/single_essay/v1.0/"},
         ]
     }))
 
@@ -176,7 +175,7 @@ class TestVersionDropdown:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
-            page.goto(f"{base_url}/essays/test_essay/")
+            page.goto(f"{base_url}/test_essay/")
             page.wait_for_selector(".version-dropdown")
             toggle = page.locator(".version-toggle")
             assert toggle.text_content().strip().startswith("v1.1")
@@ -188,7 +187,7 @@ class TestVersionDropdown:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
-            page.goto(f"{base_url}/essays/test_essay/")
+            page.goto(f"{base_url}/test_essay/")
             page.wait_for_selector(".version-dropdown")
             page.click(".version-toggle")
             items = page.locator(".version-list li")
@@ -201,7 +200,7 @@ class TestVersionDropdown:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
-            page.goto(f"{base_url}/essays/test_essay/v1.0/")
+            page.goto(f"{base_url}/test_essay/v1.0/")
             page.wait_for_selector(".version-dropdown")
             page.click(".version-toggle")
             current = page.locator("a.version-current")
@@ -214,13 +213,13 @@ class TestVersionDropdown:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
-            page.goto(f"{base_url}/essays/test_essay/")
+            page.goto(f"{base_url}/test_essay/")
             page.wait_for_selector(".version-dropdown")
             page.click(".version-toggle")
             links = page.locator(".version-list li a")
             hrefs = [links.nth(i).get_attribute("href") for i in range(links.count())]
-            assert "/essays/test_essay/v1.1/" in hrefs
-            assert "/essays/test_essay/v1.0/" in hrefs
+            assert "/test_essay/v1.1/" in hrefs
+            assert "/test_essay/v1.0/" in hrefs
             browser.close()
 
     def test_dates_shown_in_dropdown(self, essay_site):
@@ -229,7 +228,7 @@ class TestVersionDropdown:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
-            page.goto(f"{base_url}/essays/test_essay/")
+            page.goto(f"{base_url}/test_essay/")
             page.wait_for_selector(".version-dropdown")
             page.click(".version-toggle")
             dates = page.locator(".version-date")
@@ -248,7 +247,7 @@ class TestSingleVersion:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
-            page.goto(f"{base_url}/essays/single_essay/")
+            page.goto(f"{base_url}/single_essay/")
             # Wait for JS to run
             page.wait_for_load_state("networkidle")
             dropdown = page.locator(".version-dropdown")

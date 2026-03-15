@@ -52,8 +52,8 @@ def main():
     version = args.version or manifest.get("name", "")
     published_at = manifest.get("published_at", "")
 
-    link = f"/essays/{args.essay_id}/"
-    version_link = f"/essays/{args.essay_id}/{version}/" if version else link
+    link = f"/{args.essay_id}/"
+    version_link = f"/{args.essay_id}/{version}/" if version else link
 
     # Load registry
     registry_path = args.registry

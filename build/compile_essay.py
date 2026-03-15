@@ -106,7 +106,7 @@ def main():
     if args.output_dir:
         output_dir = args.output_dir / args.essay_id
     else:
-        output_dir = repo_root / "essays" / args.essay_id
+        output_dir = repo_root / args.essay_id
     if version:
         output_dir = output_dir / version
     output_dir.mkdir(parents=True, exist_ok=True)

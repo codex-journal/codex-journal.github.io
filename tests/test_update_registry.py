@@ -34,10 +34,10 @@ class TestNewEntry:
         assert entry["id"] == "test_essay"
         assert entry["current_version"] == "v1.0"
         assert entry["published_date"] == "2026-02-15T10:00:00Z"
-        assert entry["link"] == "/essays/test_essay/"
+        assert entry["link"] == "/test_essay/"
         assert len(entry["versions"]) == 1
         assert entry["versions"][0]["version"] == "v1.0"
-        assert entry["versions"][0]["link"] == "/essays/test_essay/v1.0/"
+        assert entry["versions"][0]["link"] == "/test_essay/v1.0/"
 
     def test_uses_manifest_name_as_default_version(self, tmp_publish_dir, registry_path):
         d = tmp_publish_dir(version="v2.0")
@@ -105,7 +105,7 @@ class TestMatchById:
                 "author": "Old",
                 "current_version": "v0.1",
                 "published_date": "2026-01-01",
-                "link": "/essays/test_essay/",
+                "link": "/test_essay/",
             }]
         }))
         d = tmp_publish_dir(version="v1.0")

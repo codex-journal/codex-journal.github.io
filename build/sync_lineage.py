@@ -48,7 +48,7 @@ def ls_remote_versions(repo_url, lineage):
 
 def already_compiled(essay_id, version):
     """Check if a version directory already exists."""
-    return (PROJECT_ROOT / "essays" / essay_id / version / "index.html").exists()
+    return (PROJECT_ROOT / essay_id / version / "index.html").exists()
 
 
 def fetch_ref(repo_url, ref, dest_dir):
@@ -118,7 +118,7 @@ def write_versions_json(essay_id):
     for entry in registry.get("essays", []):
         if entry.get("id") == essay_id:
             versions = entry.get("versions", [])
-            out_path = PROJECT_ROOT / "essays" / essay_id / "versions.json"
+            out_path = PROJECT_ROOT / essay_id / "versions.json"
             out_path.parent.mkdir(parents=True, exist_ok=True)
             with open(out_path, "w") as f:
                 json.dump({"versions": versions}, f, indent=2)
@@ -142,8 +142,8 @@ def copy_latest_to_root(essay_id):
             current = entry.get("current_version", "")
             if not current:
                 return
-            src = PROJECT_ROOT / "essays" / essay_id / current / "index.html"
-            dst = PROJECT_ROOT / "essays" / essay_id / "index.html"
+            src = PROJECT_ROOT / essay_id / current / "index.html"
+            dst = PROJECT_ROOT / essay_id / "index.html"
             if src.exists():
                 shutil.copy2(str(src), str(dst))
                 print(f"  latest: {current} -> {dst}")
