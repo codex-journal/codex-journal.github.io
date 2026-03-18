@@ -5,29 +5,28 @@ from pathlib import Path
 from unittest.mock import patch, MagicMock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "build"))
-from sync_lineage import ls_remote_versions, already_compiled
+from sync_lineage import list_versions, already_compiled
 
 
-class TestLsRemoteVersions:
-    def test_parses_refs(self):
+class TestListVersions:
+    def test_parses_tree_entries(self, tmp_path):
+        """list_versions parses git ls-tree output for lineage subtrees."""
         mock_result = MagicMock()
         mock_result.returncode = 0
         mock_result.stdout = (
-            "abc123\trefs/knots/publish/main/v1.0\n"
-            "def456\trefs/knots/publish/main/v1.1\n"
+            "040000 tree abc123\texocap_index/1.0\n"
+            "040000 tree def456\texocap_index/1.1\n"
         )
         with patch("sync_lineage.subprocess.run", return_value=mock_result):
-            versions = ls_remote_versions("git@example.com:repo.git", "main")
-        assert len(versions) == 2
-        assert versions[0] == ("v1.0", "refs/knots/publish/main/v1.0")
-        assert versions[1] == ("v1.1", "refs/knots/publish/main/v1.1")
+            versions = list_versions("/tmp/git", "fake_sha", "exocap_index")
+        assert versions == ["1.0", "1.1"]
 
-    def test_empty_output(self):
+    def test_empty_output(self, tmp_path):
         mock_result = MagicMock()
         mock_result.returncode = 0
         mock_result.stdout = ""
         with patch("sync_lineage.subprocess.run", return_value=mock_result):
-            versions = ls_remote_versions("git@example.com:repo.git", "main")
+            versions = list_versions("/tmp/git", "fake_sha", "exocap_index")
         assert versions == []
 
 

@@ -4,9 +4,10 @@
 Usage:
     python build/sync_lineage.py <essay-id> <source-repo-url> <lineage>
 
-Enumerates all refs/knots/publish/{lineage}/* snapshots via git ls-remote,
-compiles any new versions, updates the registry, writes versions.json,
-and copies the latest version to the essay root.
+Fetches refs/knots/publish (a tree object) from the source repo, walks
+the tree to find {lineage}/{version}/ subtrees, compiles any new versions,
+updates the registry, writes versions.json, and copies the latest version
+to the essay root.
 
 Expects GIT_SSH_COMMAND to be set if the source repo requires SSH auth.
 """
@@ -24,58 +25,66 @@ BUILD_DIR = Path(__file__).resolve().parent
 REGISTRY_PATH = PROJECT_ROOT / "_data" / "essays.json"
 
 
-def ls_remote_versions(repo_url, lineage):
-    """List all snapshot names under refs/knots/publish/{lineage}/."""
-    prefix = f"refs/knots/publish/{lineage}/"
+def fetch_publish_tree(repo_url, git_dir):
+    """Fetch refs/knots/publish into git_dir, return tree SHA."""
+    subprocess.run(["git", "init", str(git_dir)],
+                   capture_output=True, check=True)
+    subprocess.run(["git", "-C", str(git_dir), "remote", "add", "source", repo_url],
+                   capture_output=True, check=True)
     result = subprocess.run(
-        ["git", "ls-remote", repo_url, f"{prefix}*"],
+        ["git", "-C", str(git_dir), "fetch", "source", "refs/knots/publish"],
         capture_output=True, text=True,
     )
     if result.returncode != 0:
-        print(f"Error: git ls-remote failed:\n{result.stderr}", file=sys.stderr)
+        print(f"Error fetching publish tree:\n{result.stderr}", file=sys.stderr)
         sys.exit(1)
+
+    sha = subprocess.run(
+        ["git", "-C", str(git_dir), "rev-parse", "FETCH_HEAD"],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    return sha
+
+
+def list_versions(git_dir, tree_sha, lineage):
+    """List version names under a lineage in the publish tree."""
+    result = subprocess.run(
+        ["git", "-C", str(git_dir), "ls-tree", tree_sha, f"{lineage}/"],
+        capture_output=True, text=True,
+    )
+    if result.returncode != 0 or not result.stdout.strip():
+        return []
 
     versions = []
     for line in result.stdout.strip().splitlines():
-        if not line:
-            continue
-        _sha, ref = line.split(None, 1)
-        name = ref.removeprefix(prefix)
-        if name:
-            versions.append((name, ref))
+        # format: <mode> <type> <sha>\t<path>
+        _meta, path = line.split("\t", 1)
+        version = path.rstrip("/").split("/")[-1]
+        versions.append(version)
     return versions
+
+
+def extract_version(git_dir, tree_sha, lineage, version, dest_dir):
+    """Extract a version subtree to dest_dir."""
+    prefix = f"{lineage}/{version}/"
+    archive = subprocess.run(
+        ["git", "-C", str(git_dir), "archive", tree_sha, "--", prefix],
+        capture_output=True,
+    )
+    if archive.returncode != 0:
+        return False
+
+    strip = prefix.count("/")
+    result = subprocess.run(
+        ["tar", "-x", "-C", str(dest_dir), f"--strip-components={strip}"],
+        input=archive.stdout, capture_output=True,
+    )
+    return result.returncode == 0
 
 
 def already_compiled(essay_id, version):
     """Check if a version directory already exists."""
     return (PROJECT_ROOT / essay_id / version / "index.html").exists()
-
-
-def fetch_ref(repo_url, ref, dest_dir):
-    """Fetch a single ref into dest_dir."""
-    subprocess.run(["git", "init", str(dest_dir)],
-                   capture_output=True, check=True)
-    subprocess.run(["git", "-C", str(dest_dir), "remote", "add", "source", repo_url],
-                   capture_output=True, check=True)
-    result = subprocess.run(
-        ["git", "-C", str(dest_dir), "fetch", "--depth=1", "source", ref],
-        capture_output=True, text=True,
-    )
-    if result.returncode != 0:
-        print(f"Error fetching {ref}:\n{result.stderr}", file=sys.stderr)
-        return False
-    subprocess.run(["git", "-C", str(dest_dir), "checkout", "FETCH_HEAD"],
-                   capture_output=True, check=True)
-    return True
-
-
-def read_published_at(publish_dir):
-    """Read published_at from manifest.json for sorting."""
-    manifest_path = Path(publish_dir) / "manifest.json"
-    if manifest_path.exists():
-        with open(manifest_path) as f:
-            return json.load(f).get("published_at", "")
-    return ""
 
 
 def compile_version(publish_dir, essay_id, version):
@@ -108,7 +117,7 @@ def update_registry(publish_dir, essay_id, version):
 
 
 def write_versions_json(essay_id):
-    """Write essays/{id}/versions.json from registry data."""
+    """Write {id}/versions.json from registry data."""
     if not REGISTRY_PATH.exists():
         return
 
@@ -162,37 +171,34 @@ def main():
 
     print(f"Syncing {essay_id} from {lineage}")
 
-    # Enumerate remote versions
-    remote_versions = ls_remote_versions(repo_url, lineage)
-    if not remote_versions:
-        print("No publish refs found")
-        return
+    with tempfile.TemporaryDirectory() as git_dir:
+        tree_sha = fetch_publish_tree(repo_url, git_dir)
 
-    print(f"Found {len(remote_versions)} remote version(s)")
+        versions = list_versions(git_dir, tree_sha, lineage)
+        if not versions:
+            print("No versions found")
+            return
 
-    # Filter to new versions
-    new_versions = [
-        (name, ref) for name, ref in remote_versions
-        if not already_compiled(essay_id, name)
-    ]
+        print(f"Found {len(versions)} version(s)")
 
-    if not new_versions:
-        print("All versions already compiled")
-    else:
-        print(f"Compiling {len(new_versions)} new version(s)")
+        new_versions = [v for v in versions if not already_compiled(essay_id, v)]
 
-        # Sort by version name for deterministic order
-        new_versions.sort(key=lambda x: x[0])
+        if not new_versions:
+            print("All versions already compiled")
+        else:
+            print(f"Compiling {len(new_versions)} new version(s)")
+            new_versions.sort()
 
-        for name, ref in new_versions:
-            print(f"\n--- {name} ---")
-            with tempfile.TemporaryDirectory() as tmp:
-                if not fetch_ref(repo_url, ref, tmp):
-                    continue
-                if not compile_version(tmp, essay_id, name):
-                    continue
-                if not update_registry(tmp, essay_id, name):
-                    continue
+            for version in new_versions:
+                print(f"\n--- {version} ---")
+                with tempfile.TemporaryDirectory() as dest:
+                    if not extract_version(git_dir, tree_sha, lineage, version, dest):
+                        print(f"  Error extracting {version}", file=sys.stderr)
+                        continue
+                    if not compile_version(dest, essay_id, version):
+                        continue
+                    if not update_registry(dest, essay_id, version):
+                        continue
 
     # Always rewrite versions.json and copy latest (handles reruns)
     write_versions_json(essay_id)

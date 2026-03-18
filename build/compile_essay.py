@@ -42,12 +42,25 @@ def main():
     with open(manifest_path) as f:
         manifest = json.load(f)
 
-    # Find the writing/essay document
-    doc = manifest["documents"]["writing/essay"]
+    # Find the main document (first with a title in frontmatter)
+    doc = None
+    for _key, d in manifest["documents"].items():
+        if d.get("frontmatter", {}).get("title"):
+            doc = d
+            break
+    if not doc:
+        print("Error: no document with title found in manifest", file=sys.stderr)
+        sys.exit(1)
     frontmatter = dict(doc["frontmatter"])
 
-    # Resolve markdown source
-    md_artifact = doc["artifacts"][0]["path"]
+    # Resolve markdown source (prefer "md" format artifact, fall back to first)
+    md_artifact = None
+    for art in doc["artifacts"]:
+        if art.get("format") == "md":
+            md_artifact = art["path"]
+            break
+    if not md_artifact:
+        md_artifact = doc["artifacts"][0]["path"]
     md_path = publish_dir / md_artifact
     if not md_path.exists():
         print(f"Error: {md_path} not found", file=sys.stderr)
@@ -69,6 +82,12 @@ def main():
 
     # Remove csl from frontmatter — we pass it as a CLI arg
     frontmatter.pop("csl", None)
+
+    # Strip @ prefixes from author-links (citeproc parses @ as citations)
+    if "author-links" in frontmatter:
+        frontmatter["author-links"] = {
+            k: v.lstrip("@") for k, v in frontmatter["author-links"].items()
+        }
 
     # Build YAML frontmatter block
     yaml_lines = ["---"]

@@ -21,10 +21,10 @@
         }
         .essay-header-captcha {
             position: absolute;
-            right: 0;
-            top: 40%;
+            right: -5%;
+            top: 50%;
             transform: translateY(-50%);
-            width: 65%;
+            width: 55%;
             height: auto;
             opacity: 0.18;
             filter: grayscale(100%) brightness(1.2);
@@ -43,8 +43,8 @@
         .bottom-art-img {
             max-width: 60%;
             height: auto;
-            opacity: 0.25;
-            filter: grayscale(100%) brightness(1.2);
+            opacity: 0.6;
+            filter: grayscale(100%) invert(1) brightness(1.0);
             mix-blend-mode: multiply;
             pointer-events: none;
             user-select: none;
@@ -98,7 +98,7 @@ $body$
         </footer>
 
         <div class="bottom-art" aria-hidden="true">
-            <img src="/resources/figure-dotted.jpg" alt="" class="bottom-art-img">
+            <img src="../bottom-art.png" alt="" class="bottom-art-img" onerror="this.parentElement.style.display='none'">
         </div>
     </div>
 <script src="/js/sidebars.js"></script>
