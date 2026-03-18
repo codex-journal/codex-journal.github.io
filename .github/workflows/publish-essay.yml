@@ -49,6 +49,7 @@ jobs:
           git add "${{ inputs.essay_id }}/" "_data/essays.json" index.html essays.html feeds.html
           git diff --cached --quiet && echo "No changes to commit" && exit 0
           git commit -m "Sync ${{ inputs.essay_id }} (${{ inputs.lineage }})"
+          git pull --rebase
           git push
 
       - name: Cleanup
