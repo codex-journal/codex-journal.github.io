@@ -40,7 +40,15 @@ def main():
     with open(manifest_path) as f:
         manifest = json.load(f)
 
-    doc = manifest["documents"]["writing/essay"]
+    # Find the main document (first with a title in frontmatter)
+    doc = None
+    for _key, d in manifest["documents"].items():
+        if d.get("frontmatter", {}).get("title"):
+            doc = d
+            break
+    if not doc:
+        print("Error: no document with title found in manifest", file=sys.stderr)
+        sys.exit(1)
     fm = doc["frontmatter"]
 
     title = fm.get("title", "")
