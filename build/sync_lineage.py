@@ -172,14 +172,19 @@ def copy_latest_to_root(essay_id):
 
 
 def main():
-    if len(sys.argv) != 4:
-        print(f"Usage: {sys.argv[0]} <essay-id> <source-repo-url> <lineage>",
-              file=sys.stderr)
-        sys.exit(1)
+    import argparse
+    parser = argparse.ArgumentParser(description="Sync essay lineage")
+    parser.add_argument("essay_id", help="Essay directory name")
+    parser.add_argument("repo_url", help="Source repo URL")
+    parser.add_argument("lineage", help="Knots lineage name")
+    parser.add_argument("--force", action="store_true",
+                        help="Force recompilation of all versions")
+    args = parser.parse_args()
 
-    essay_id = sys.argv[1]
-    repo_url = sys.argv[2]
-    lineage = sys.argv[3]
+    essay_id = args.essay_id
+    repo_url = args.repo_url
+    lineage = args.lineage
+    force = args.force
 
     print(f"Syncing {essay_id} from {lineage}")
 
@@ -198,7 +203,7 @@ def main():
             compiled = already_compiled(essay_id, version)
             registered = version_in_registry(essay_id, version)
 
-            if compiled and registered:
+            if compiled and registered and not force:
                 continue
 
             print(f"\n--- {version} ---")
@@ -206,7 +211,7 @@ def main():
                 if not extract_version(git_dir, tree_sha, lineage, version, dest):
                     print(f"  Error extracting {version}", file=sys.stderr)
                     continue
-                if not compiled:
+                if not compiled or force:
                     if not compile_version(dest, essay_id, version):
                         continue
                 if not registered:

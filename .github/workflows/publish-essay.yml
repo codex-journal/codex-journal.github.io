@@ -11,6 +11,11 @@ on:
         description: "Knots lineage name"
         required: true
         type: string
+      force:
+        description: "Force recompilation of all versions"
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   publish:
@@ -37,7 +42,7 @@ jobs:
           sudo apt-get install -y -qq pandoc
 
       - name: Sync lineage
-        run: python build/sync_lineage.py "${{ inputs.essay_id }}" git@github.com:codex-journal/source_engineering.git "${{ inputs.lineage }}"
+        run: python build/sync_lineage.py "${{ inputs.essay_id }}" git@github.com:codex-journal/source_engineering.git "${{ inputs.lineage }}" ${{ inputs.force == true && '--force' || '' }}
 
       - name: Rebuild index
         run: python build/build_index.py
