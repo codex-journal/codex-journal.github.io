@@ -87,6 +87,18 @@ def already_compiled(essay_id, version):
     return (PROJECT_ROOT / essay_id / version / "index.html").exists()
 
 
+def version_in_registry(essay_id, version):
+    """Check if a version is already in the registry."""
+    if not REGISTRY_PATH.exists():
+        return False
+    with open(REGISTRY_PATH) as f:
+        registry = json.load(f)
+    for entry in registry.get("essays", []):
+        if entry.get("id") == essay_id:
+            return any(v.get("version") == version for v in entry.get("versions", []))
+    return False
+
+
 def compile_version(publish_dir, essay_id, version):
     """Run compile_essay.py for one version."""
     cmd = [
@@ -180,23 +192,24 @@ def main():
             return
 
         print(f"Found {len(versions)} version(s)")
+        versions.sort()
 
-        new_versions = [v for v in versions if not already_compiled(essay_id, v)]
+        for version in versions:
+            compiled = already_compiled(essay_id, version)
+            registered = version_in_registry(essay_id, version)
 
-        if not new_versions:
-            print("All versions already compiled")
-        else:
-            print(f"Compiling {len(new_versions)} new version(s)")
-            new_versions.sort()
+            if compiled and registered:
+                continue
 
-            for version in new_versions:
-                print(f"\n--- {version} ---")
-                with tempfile.TemporaryDirectory() as dest:
-                    if not extract_version(git_dir, tree_sha, lineage, version, dest):
-                        print(f"  Error extracting {version}", file=sys.stderr)
-                        continue
+            print(f"\n--- {version} ---")
+            with tempfile.TemporaryDirectory() as dest:
+                if not extract_version(git_dir, tree_sha, lineage, version, dest):
+                    print(f"  Error extracting {version}", file=sys.stderr)
+                    continue
+                if not compiled:
                     if not compile_version(dest, essay_id, version):
                         continue
+                if not registered:
                     if not update_registry(dest, essay_id, version):
                         continue
 
