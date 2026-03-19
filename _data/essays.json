@@ -29,6 +29,21 @@
           "link": "/exocap_index/1.0/"
         }
       ]
+    },
+    {
+      "id": "knots",
+      "title": "Knots: Source History Beyond Artifacts",
+      "author": "JM",
+      "current_version": "knots-memo-1.0",
+      "published_date": "2026-03-18T23:20:08Z",
+      "link": "/knots/",
+      "versions": [
+        {
+          "version": "knots-memo-1.0",
+          "published_at": "2026-03-18T23:20:08Z",
+          "link": "/knots/knots-memo-1.0/"
+        }
+      ]
     }
   ]
 }
