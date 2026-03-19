@@ -249,6 +249,32 @@
     font-size: 1.1rem;
 }
 
+/* --- Code Blocks --- */
+
+.essay-body pre {
+    overflow-x: auto;
+    max-width: 100%;
+    padding: 1em 1.2em;
+    margin: 1.5em 0;
+    background: #f8f8f8;
+    border: 1px dotted #ccc;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: #1a1a1a;
+}
+
+.essay-body code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85em;
+}
+
+.essay-body :not(pre) > code {
+    background: #f4f4f4;
+    padding: 0.15em 0.35em;
+    border-radius: 2px;
+}
+
 /* --- Sentence ID Anchors --- */
 
 .sid {
