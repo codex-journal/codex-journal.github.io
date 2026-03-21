@@ -181,6 +181,7 @@ def fetch_all_feeds(configs, timeout=10):
 def render_essay_entries(essays):
     if not essays:
         return ""
+    essays = sorted(essays, key=lambda e: e.get("published_date", ""), reverse=True)
     parts = []
     for essay in essays:
         title = essay.get("title", "[Title]")
