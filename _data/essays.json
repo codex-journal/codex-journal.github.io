@@ -34,10 +34,15 @@
       "id": "knots",
       "title": "Knots: Source History Beyond Artifacts",
       "author": "JM",
-      "current_version": "knots-memo-1.5",
-      "published_date": "2026-03-22T17:04:45Z",
+      "current_version": "knots-memo-1.6",
+      "published_date": "2026-03-22T17:13:11Z",
       "link": "/knots/",
       "versions": [
+        {
+          "version": "knots-memo-1.6",
+          "published_at": "2026-03-22T17:13:11Z",
+          "link": "/knots/knots-memo-1.6/"
+        },
         {
           "version": "knots-memo-1.5",
           "published_at": "2026-03-22T17:04:45Z",
