@@ -151,7 +151,7 @@ def write_versions_json(essay_id):
 
 
 def copy_latest_to_root(essay_id):
-    """Copy the latest version's index.html to the essay root."""
+    """Copy the latest version's files to the essay root."""
     if not REGISTRY_PATH.exists():
         return
 
@@ -163,11 +163,13 @@ def copy_latest_to_root(essay_id):
             current = entry.get("current_version", "")
             if not current:
                 return
-            src = PROJECT_ROOT / essay_id / current / "index.html"
-            dst = PROJECT_ROOT / essay_id / "index.html"
-            if src.exists():
-                shutil.copy2(str(src), str(dst))
-                print(f"  latest: {current} -> {dst}")
+            version_dir = PROJECT_ROOT / essay_id / current
+            for filename in ["index.html", "essay.md", "essay.epub"]:
+                src = version_dir / filename
+                dst = PROJECT_ROOT / essay_id / filename
+                if src.exists():
+                    shutil.copy2(str(src), str(dst))
+            print(f"  latest: {current} -> {PROJECT_ROOT / essay_id}/")
             return
 
 
