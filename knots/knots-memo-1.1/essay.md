@@ -400,6 +400,8 @@ engineering line are welcome to reach out there. The software is already
 usable, but the repository and contribution surface are still being
 reduced and clarified before a fuller public release.
 
+# References {#bibliography .unnumbered}
+
 [^1]: A concrete software-engineering symptom of this pressure appears
     in Steve Yegge's "The AI Vampire" (Feb. 11, 2026):
     https://steve-yegge.medium.com/the-ai-vampire-eda6e4f07163.

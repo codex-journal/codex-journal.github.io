@@ -333,3 +333,5 @@ current state, or discuss the source engineering line are welcome to
 reach out there. The software is already usable, but the repository and
 contribution surface are still being reduced and clarified before a
 fuller public release.
+
+# References {#bibliography .unnumbered}

@@ -360,6 +360,8 @@ For now, access is best handled directly. Email:
 inspect the code, try knots in its current state, or discuss the source
 engineering line are welcome to reach out there.
 
+# References {#bibliography .unnumbered}
+
 [^1]: A concrete software-engineering symptom of this pressure appears
     in Steve Yegge's "The AI Vampire" (Feb. 11, 2026):
     https://steve-yegge.medium.com/the-ai-vampire-eda6e4f07163.

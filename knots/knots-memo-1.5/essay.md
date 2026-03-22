@@ -386,6 +386,8 @@ For now, access is best handled directly. Email:
 inspect the code, try knots in its current state, or discuss the source
 engineering line are welcome to reach out there.
 
+# References {#bibliography .unnumbered}
+
 [^1]: See Darcs, "Mergers documentation"
     (https://darcs.net/Theory/MergersDocumentation), Darcs,
     "Conflictors" (https://darcs.net/Theory/Conflictors), and Pijul,
