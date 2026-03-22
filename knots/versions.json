@@ -1,6 +1,11 @@
 {
   "versions": [
     {
+      "version": "knots-memo-1.9",
+      "published_at": "2026-03-22T21:01:12Z",
+      "link": "/knots/knots-memo-1.9/"
+    },
+    {
       "version": "knots-memo-1.7",
       "published_at": "2026-03-22T20:42:59Z",
       "link": "/knots/knots-memo-1.7/"
