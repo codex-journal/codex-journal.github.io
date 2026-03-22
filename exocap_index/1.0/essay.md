@@ -529,6 +529,8 @@ temporal significance as intelligible origin, and space becomes
 subordinate to time. Earth remains significant not as permanent center
 but as origin, where the cosmos finally becomes historical.
 
+# References {#bibliography .unnumbered}
+
 [^1]: Garden 3D describes itself as a worker-owned collective working
     across design, technology, community, and media.
 
