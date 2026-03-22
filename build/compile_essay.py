@@ -157,6 +157,7 @@ def main():
             "--citeproc",
             "--csl", str(csl_path),
             "-t", "markdown",
+            "--metadata", "reference-section-title=References",
             "-o", str(md_out),
         ]
         md_result = subprocess.run(md_cmd, capture_output=True, text=True)
