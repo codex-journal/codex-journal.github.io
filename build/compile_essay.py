@@ -137,6 +137,7 @@ def main():
     csl_path = build_dir / "chicago-author-date.csl"
 
     try:
+        # Compile HTML
         cmd = [
             "pandoc", str(tmp_path),
             "--defaults", str(defaults_path),
@@ -148,6 +149,35 @@ def main():
         if result.returncode != 0:
             print(f"Pandoc error:\n{result.stderr}", file=sys.stderr)
             sys.exit(1)
+
+        # Render citeproc-resolved markdown
+        md_out = output_dir / "essay.md"
+        md_cmd = [
+            "pandoc", str(tmp_path),
+            "--citeproc",
+            "--csl", str(csl_path),
+            "-t", "markdown",
+            "-o", str(md_out),
+        ]
+        md_result = subprocess.run(md_cmd, capture_output=True, text=True)
+        if md_result.returncode != 0:
+            print(f"Markdown warning:\n{md_result.stderr}", file=sys.stderr)
+        else:
+            print(f"  md: {md_out}", file=sys.stderr)
+
+        # Generate epub
+        epub_out = output_dir / "essay.epub"
+        epub_cmd = [
+            "pandoc", str(tmp_path),
+            "--citeproc",
+            "--csl", str(csl_path),
+            "-o", str(epub_out),
+        ]
+        epub_result = subprocess.run(epub_cmd, capture_output=True, text=True)
+        if epub_result.returncode != 0:
+            print(f"EPUB warning:\n{epub_result.stderr}", file=sys.stderr)
+        else:
+            print(f"  epub: {epub_out}", file=sys.stderr)
     finally:
         tmp_path.unlink(missing_ok=True)
 

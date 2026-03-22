@@ -348,6 +348,7 @@
     letter-spacing: 0.04em;
     border-bottom: 1px dotted #aaa;
     text-transform: uppercase;
+    margin-right: 1em;
 }
 
 .essay-download a:hover {

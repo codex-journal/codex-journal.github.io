@@ -116,10 +116,10 @@ class TestTableOfContents:
         assert "Second" in html
         assert 'class="toc-dropdown"' in html
 
-    def test_no_toc_without_sections(self, tmp_publish_dir, tmp_path):
-        """Default fixture has only ## headings which become H3, below toc-depth."""
+    def test_toc_includes_h3_sections(self, tmp_publish_dir, tmp_path):
+        """Default fixture has ## headings which become H3, included at toc-depth 3."""
         d = tmp_publish_dir(version="v1.0")
         out = tmp_path / "out"
         output_path = compile(d, "notoc_essay", "v1.0", out)
         html = output_path.read_text()
-        assert 'id="essay-toc"' not in html
+        assert 'id="essay-toc"' in html
