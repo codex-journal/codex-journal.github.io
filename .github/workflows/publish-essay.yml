@@ -38,8 +38,8 @@ jobs:
 
       - name: Install Pandoc
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq pandoc
+          wget -q https://github.com/jgm/pandoc/releases/download/3.7.0.2/pandoc-3.7.0.2-1-amd64.deb
+          sudo dpkg -i pandoc-3.7.0.2-1-amd64.deb
 
       - name: Sync lineage
         run: python build/sync_lineage.py "${{ inputs.essay_id }}" git@github.com:codex-journal/source_engineering.git "${{ inputs.lineage }}" ${{ inputs.force == true && '--force' || '' }}
