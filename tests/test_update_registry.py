@@ -33,7 +33,7 @@ class TestNewEntry:
         entry = reg["essays"][0]
         assert entry["id"] == "test_essay"
         assert entry["current_version"] == "v1.0"
-        assert entry["published_date"] == "2026-02-15T10:00:00Z"
+        assert entry["published_date"] == "2026-02-15"
         assert entry["link"] == "/test_essay/"
         assert len(entry["versions"]) == 1
         assert entry["versions"][0]["version"] == "v1.0"
@@ -48,8 +48,8 @@ class TestNewEntry:
 
 class TestMultiVersion:
     def test_appends_second_version(self, tmp_publish_dir, registry_path):
-        d1 = tmp_publish_dir(version="v1.0", published_at="2026-02-15T10:00:00Z")
-        d2 = tmp_publish_dir(version="v1.1", published_at="2026-02-28T14:00:00Z",
+        d1 = tmp_publish_dir(version="v1.0", date="2026-02-15")
+        d2 = tmp_publish_dir(version="v1.1", date="2026-02-28",
                              title="Revised Title")
         run_update_registry(d1, "test_essay", "v1.0", registry_path)
         run_update_registry(d2, "test_essay", "v1.1", registry_path)
@@ -57,12 +57,12 @@ class TestMultiVersion:
         entry = reg["essays"][0]
         assert len(entry["versions"]) == 2
         assert entry["current_version"] == "v1.1"
-        assert entry["published_date"] == "2026-02-28T14:00:00Z"
+        assert entry["published_date"] == "2026-02-28"
         assert entry["title"] == "Revised Title"
 
     def test_versions_sorted_desc_by_published_at(self, tmp_publish_dir, registry_path):
-        d1 = tmp_publish_dir(version="v1.0", published_at="2026-02-15T10:00:00Z")
-        d2 = tmp_publish_dir(version="v1.1", published_at="2026-02-28T14:00:00Z")
+        d1 = tmp_publish_dir(version="v1.0", date="2026-02-15")
+        d2 = tmp_publish_dir(version="v1.1", date="2026-02-28")
         run_update_registry(d1, "test_essay", "v1.0", registry_path)
         run_update_registry(d2, "test_essay", "v1.1", registry_path)
         reg = load_registry(registry_path)
@@ -72,9 +72,9 @@ class TestMultiVersion:
 
     def test_top_level_fields_from_latest(self, tmp_publish_dir, registry_path):
         # Add v1.1 first (later date), then v1.0 (earlier date)
-        d2 = tmp_publish_dir(version="v1.1", published_at="2026-02-28T14:00:00Z",
+        d2 = tmp_publish_dir(version="v1.1", date="2026-02-28",
                              title="Latest Title", author="Latest Author")
-        d1 = tmp_publish_dir(version="v1.0", published_at="2026-02-15T10:00:00Z",
+        d1 = tmp_publish_dir(version="v1.0", date="2026-02-15",
                              title="Old Title", author="Old Author")
         run_update_registry(d2, "test_essay", "v1.1", registry_path)
         run_update_registry(d1, "test_essay", "v1.0", registry_path)
@@ -82,7 +82,7 @@ class TestMultiVersion:
         entry = reg["essays"][0]
         # Top-level should reflect latest (v1.1), not most recently added (v1.0)
         assert entry["current_version"] == "v1.1"
-        assert entry["published_date"] == "2026-02-28T14:00:00Z"
+        assert entry["published_date"] == "2026-02-28"
 
 
 class TestIdempotency:

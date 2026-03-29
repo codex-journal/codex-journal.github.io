@@ -58,7 +58,7 @@ def main():
     else:
         author = str(author_raw)
     version = args.version or manifest.get("name", "")
-    published_at = manifest.get("published_at", "")
+    published_at = fm.get("date", "") or manifest.get("published_at", "")
 
     link = f"/{args.essay_id}/"
     version_link = f"/{args.essay_id}/{version}/" if version else link
