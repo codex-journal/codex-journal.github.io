@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Knots Timeline — Canvas Prototype</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a0f;
+  color: #ddd;
+  font-family: 'IBM Plex Mono', monospace;
+  overflow: hidden;
+}
+
+canvas#main {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* --- Transport controls --- */
+.transport {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(10, 10, 15, 0.95);
+  border-top: 1px solid #222;
+  padding: 0.8rem 2rem;
+  z-index: 200;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.transport button {
+  font-family: inherit;
+  font-size: 14px;
+  background: none;
+  border: 1px solid #444;
+  color: #aaa;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+  border-radius: 2px;
+  min-width: 2.5rem;
+  text-align: center;
+}
+.transport button:hover { border-color: #daa520; color: #daa520; }
+.transport button.active { background: #daa520; color: #0a0a0f; border-color: #daa520; }
+
+.timeline-track {
+  flex: 1;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.timeline-bar {
+  width: 100%;
+  height: 2px;
+  background: #333;
+  position: relative;
+}
+.timeline-progress {
+  height: 100%;
+  background: #daa520;
+  width: 0%;
+  transition: width 0.3s;
+}
+.timeline-markers {
+  position: absolute;
+  top: -5px; left: 0; right: 0;
+  height: 12px;
+  pointer-events: none;
+}
+.timeline-marker {
+  position: absolute;
+  width: 10px; height: 10px;
+  background: #222;
+  border: 1px solid #666;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.timeline-marker.current { background: #daa520; border-color: #daa520; }
+
+.version-label {
+  color: #daa520;
+  min-width: 3rem;
+  text-align: center;
+  font-size: 13px;
+}
+
+.stats {
+  position: fixed;
+  top: 1rem; right: 1.5rem;
+  font-size: 10px;
+  color: #555;
+  text-align: right;
+  line-height: 1.8;
+  z-index: 100;
+}
+.stats .n { color: #daa520; }
+.stats .added { color: #5cb85c; }
+.stats .removed { color: #c0392b; }
+.stats .modified { color: #daa520; }
+
+.title-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  padding: 1rem 2rem;
+  font-size: 10px;
+  color: #444;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  z-index: 100;
+}
+</style>
+</head>
+<body>
+
+<div class="title-bar">Knots Timeline</div>
+<div class="stats" id="stats"></div>
+<canvas id="main"></canvas>
+
+<div class="transport">
+  <button id="btn-prev">&#9664;</button>
+  <button id="btn-play">&#9654;</button>
+  <button id="btn-next">&#9654;</button>
+  <div class="timeline-track">
+    <div class="timeline-bar" id="timeline-bar">
+      <div class="timeline-progress" id="timeline-progress"></div>
+      <div class="timeline-markers" id="timeline-markers"></div>
+    </div>
+  </div>
+  <div class="version-label" id="version-display"></div>
+</div>
+
+<script type="module">
+import { prepareWithSegments, layoutWithLines } from './pretext.bundle.js';
+
+// ============================================================
+// Knots parser
+// ============================================================
+function parseKnots(text) {
+  const lines = text.split('\n');
+  const blocks = [];
+  let current = null;
+  for (const line of lines) {
+    const hm = line.match(/^\[([0-9a-f]{4}):(h[1-3])\]\s*(.*)/);
+    if (hm) {
+      current = { type: hm[2], id: hm[1], sentences: [{ id: hm[1], text: hm[3] }] };
+      blocks.push(current);
+      continue;
+    }
+    const pm = line.match(/^\[([0-9a-f]{4}):p\]/);
+    if (pm) {
+      current = { type: 'p', id: pm[1], sentences: [] };
+      blocks.push(current);
+      continue;
+    }
+    const sm = line.match(/^\s+\[([0-9a-f]{4}):s\]\s*(.*)/);
+    if (sm && current) {
+      current.sentences.push({ id: sm[1], text: sm[2] });
+      continue;
+    }
+    if (current && current.sentences.length > 0 && line.trim()) {
+      current.sentences[current.sentences.length - 1].text += ' ' + line.trim();
+    }
+  }
+  return blocks;
+}
+
+function cleanText(text) {
+  return text.replace(/@[\w]+/g, '').replace(/\[.*?\]/g, '').replace(/\{.*?\}/g, '').replace(/\^/g, '').replace(/\s+/g, ' ').trim();
+}
+
+// ============================================================
+// Layout engine — uses pretext for measurement
+// ============================================================
+const BODY_FONT = '18px "EB Garamond", Georgia, serif';
+const HEADING_FONT = '600 13px "IBM Plex Mono", monospace';
+const SID_FONT = '9px "IBM Plex Mono", monospace';
+const LINE_HEIGHT = 30;
+const HEADING_LINE_HEIGHT = 22;
+const PARA_GAP = 24;
+const HEADING_GAP_BEFORE = 40;
+const HEADING_GAP_AFTER = 16;
+const MARGIN_LEFT = 80;
+const MARGIN_TOP = 60;
+
+// Pretext needs a canvas context — but we'll use the offscreen one it creates internally.
+// We just provide font strings.
+
+function layoutVersion(blocks, maxWidth) {
+  // Returns array of { id, type, text, x, y, w, h, lines, sentenceId }
+  const items = [];
+  let y = MARGIN_TOP;
+
+  for (const block of blocks) {
+    if (block.type.startsWith('h')) {
+      const text = block.sentences[0]?.text || '';
+      y += HEADING_GAP_BEFORE;
+
+      items.push({
+        id: block.id,
+        sentenceId: block.id,
+        type: block.type,
+        text: text,
+        x: MARGIN_LEFT,
+        y: y,
+        lines: [{ text, width: 0 }],
+        isHeading: true,
+      });
+      y += HEADING_LINE_HEIGHT + HEADING_GAP_AFTER;
+      continue;
+    }
+
+    // Paragraph
+    for (const s of block.sentences) {
+      const clean = cleanText(s.text);
+      if (!clean) continue;
+
+      let lineData;
+      try {
+        const prepared = prepareWithSegments(clean, BODY_FONT);
+        const result = layoutWithLines(prepared, maxWidth, LINE_HEIGHT);
+        lineData = result.lines;
+      } catch (e) {
+        // Fallback: single line
+        lineData = [{ text: clean, width: maxWidth }];
+      }
+
+      items.push({
+        id: s.id,
+        sentenceId: s.id,
+        type: 'sentence',
+        text: clean,
+        x: MARGIN_LEFT,
+        y: y,
+        lines: lineData,
+        height: lineData.length * LINE_HEIGHT,
+        isHeading: false,
+      });
+
+      y += lineData.length * LINE_HEIGHT;
+    }
+    y += PARA_GAP;
+  }
+
+  return { items, totalHeight: y };
+}
+
+// ============================================================
+// Diff
+// ============================================================
+function diffVersions(prevItems, currItems) {
+  const prevIds = new Set(prevItems.map(i => i.sentenceId));
+  const currIds = new Set(currItems.map(i => i.sentenceId));
+  const prevTexts = new Map(prevItems.map(i => [i.sentenceId, i.text]));
+  const currTexts = new Map(currItems.map(i => [i.sentenceId, i.text]));
+
+  const added = new Set();
+  const removed = new Set();
+  const modified = new Set();
+
+  for (const id of currIds) {
+    if (!prevIds.has(id)) added.add(id);
+    else if (currTexts.get(id) !== prevTexts.get(id)) modified.add(id);
+  }
+  for (const id of prevIds) {
+    if (!currIds.has(id)) removed.add(id);
+  }
+
+  return { added, removed, modified };
+}
+
+// ============================================================
+// Canvas renderer with animation
+// ============================================================
+const canvas = document.getElementById('main');
+const ctx = canvas.getContext('2d');
+let dpr = window.devicePixelRatio || 1;
+
+function resizeCanvas() {
+  dpr = window.devicePixelRatio || 1;
+  canvas.width = window.innerWidth * dpr;
+  canvas.height = window.innerHeight * dpr;
+  ctx.scale(dpr, dpr);
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+// Animation state
+let currentLayout = null;   // { items, totalHeight }
+let prevLayout = null;
+let diff = null;
+let animT = 1;              // 0 → 1 transition progress
+let scrollY = 0;
+let targetScrollY = 0;
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+function easeInOut(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+
+function drawFrame() {
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+  ctx.clearRect(0, 0, W, H);
+
+  // Smooth scroll
+  scrollY += (targetScrollY - scrollY) * 0.12;
+
+  if (!currentLayout) return;
+
+  const ease = easeInOut(Math.min(animT, 1));
+
+  // Build position maps for previous layout
+  const prevPositions = new Map();
+  if (prevLayout) {
+    for (const item of prevLayout.items) {
+      prevPositions.set(item.sentenceId, item);
+    }
+  }
+
+  // Draw current items
+  for (const item of currentLayout.items) {
+    let x = item.x;
+    let y = item.y - scrollY;
+    let alpha = 1;
+
+    const prevItem = prevPositions.get(item.sentenceId);
+
+    if (animT < 1 && diff) {
+      if (diff.added.has(item.sentenceId)) {
+        // Fade in
+        alpha = ease;
+      } else if (diff.modified.has(item.sentenceId) && prevItem) {
+        // Interpolate position
+        y = lerp(prevItem.y - scrollY, item.y - scrollY, ease);
+      } else if (prevItem) {
+        // Unchanged — interpolate position
+        y = lerp(prevItem.y - scrollY, item.y - scrollY, ease);
+      }
+    }
+
+    // Cull off-screen
+    const itemH = item.isHeading ? HEADING_LINE_HEIGHT : (item.lines.length * LINE_HEIGHT);
+    if (y + itemH < -50 || y > H + 50) continue;
+
+    ctx.globalAlpha = alpha;
+
+    if (item.isHeading) {
+      // Heading
+      ctx.font = HEADING_FONT;
+      ctx.fillStyle = '#888';
+      ctx.textBaseline = 'top';
+      ctx.fillText(item.text.toUpperCase(), x, y);
+
+      // Dotted line above
+      ctx.strokeStyle = '#333';
+      ctx.setLineDash([2, 4]);
+      ctx.beginPath();
+      ctx.moveTo(x, y - 8);
+      ctx.lineTo(x + 500, y - 8);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    } else {
+      // Sentence lines
+      ctx.font = BODY_FONT;
+      ctx.textBaseline = 'top';
+
+      // Color based on diff state
+      let color = '#ccc';
+      if (animT < 1 && diff) {
+        if (diff.added.has(item.sentenceId)) color = '#5cb85c';
+        else if (diff.modified.has(item.sentenceId)) color = '#daa520';
+      }
+      ctx.fillStyle = color;
+
+      for (let i = 0; i < item.lines.length; i++) {
+        ctx.fillText(item.lines[i].text, x, y + i * LINE_HEIGHT);
+      }
+
+      // Sentence ID gutter
+      ctx.font = SID_FONT;
+      ctx.fillStyle = animT < 1 && diff && diff.added.has(item.sentenceId)
+        ? 'rgba(92,184,92,0.5)'
+        : 'rgba(100,100,100,0.3)';
+      ctx.fillText(item.sentenceId, MARGIN_LEFT - 40, y + 2);
+    }
+  }
+
+  // Draw removed items fading out
+  if (animT < 1 && diff && prevLayout) {
+    const fadeAlpha = 1 - ease;
+    for (const item of prevLayout.items) {
+      if (!diff.removed.has(item.sentenceId)) continue;
+
+      let y = item.y - scrollY;
+      if (y + 100 < -50 || y > H + 50) continue;
+
+      ctx.globalAlpha = fadeAlpha * 0.6;
+      ctx.font = item.isHeading ? HEADING_FONT : BODY_FONT;
+      ctx.fillStyle = '#c0392b';
+      ctx.textBaseline = 'top';
+
+      if (item.isHeading) {
+        ctx.fillText(item.text.toUpperCase(), item.x, y);
+      } else {
+        for (let i = 0; i < item.lines.length; i++) {
+          ctx.fillText(item.lines[i].text, item.x, y + i * LINE_HEIGHT);
+        }
+      }
+    }
+  }
+
+  ctx.globalAlpha = 1;
+
+  // Version watermark
+  ctx.font = '200 120px "EB Garamond", serif';
+  ctx.fillStyle = 'rgba(218, 165, 32, 0.07)';
+  ctx.textBaseline = 'top';
+  ctx.fillText('v' + versionOrder[currentIndex], W - 300, 40);
+
+  // Flash version change indicator
+  if (animT < 0.5) {
+    ctx.font = '500 16px "IBM Plex Mono", monospace';
+    ctx.fillStyle = `rgba(218, 165, 32, ${0.8 * (1 - animT * 2)})`;
+    ctx.fillText('v' + versionOrder[currentIndex], MARGIN_LEFT, 30);
+  }
+
+  // Advance animation
+  if (animT < 1) {
+    animT += 0.02;
+    if (animT > 1) animT = 1;
+  }
+
+  requestAnimationFrame(drawFrame);
+}
+
+// ============================================================
+// Timeline state
+// ============================================================
+const allVersions = {};
+let versionOrder = [];
+let currentIndex = 0;
+let allLayouts = {};
+let playing = false;
+let playTimer = null;
+const PLAY_SPEED = 6000;
+const MAX_WIDTH = 600;
+
+function goToVersion(idx, animate = true) {
+  if (idx < 0 || idx >= versionOrder.length) return;
+
+  const prevIdx = currentIndex;
+  currentIndex = idx;
+  const vn = versionOrder[idx];
+
+  prevLayout = currentLayout;
+  currentLayout = allLayouts[vn];
+
+  if (animate && prevLayout && prevLayout !== currentLayout) {
+    diff = diffVersions(prevLayout.items, currentLayout.items);
+    animT = 0;
+  } else {
+    diff = null;
+    animT = 1;
+  }
+
+  // Reset scroll for new version
+  if (!animate) targetScrollY = 0;
+
+  updateTransport();
+  updateStats();
+}
+
+function updateTransport() {
+  const pct = versionOrder.length > 1
+    ? (currentIndex / (versionOrder.length - 1)) * 100 : 0;
+  document.getElementById('timeline-progress').style.width = pct + '%';
+  document.getElementById('version-display').textContent = 'v' + versionOrder[currentIndex];
+  document.querySelectorAll('.timeline-marker').forEach((m, i) => {
+    m.classList.toggle('current', i === currentIndex);
+  });
+}
+
+function updateStats() {
+  const layout = currentLayout;
+  if (!layout) return;
+  const sentences = layout.items.filter(i => !i.isHeading).length;
+  let html = `<span class="n">${versionOrder[currentIndex]}</span> &middot; ${sentences} sentences`;
+  if (diff) {
+    if (diff.added.size) html += ` &middot; <span class="added">+${diff.added.size}</span>`;
+    if (diff.modified.size) html += ` <span class="modified">~${diff.modified.size}</span>`;
+    if (diff.removed.size) html += ` <span class="removed">-${diff.removed.size}</span>`;
+  }
+  document.getElementById('stats').innerHTML = html;
+}
+
+function togglePlay() {
+  playing = !playing;
+  const btn = document.getElementById('btn-play');
+  btn.textContent = playing ? '\u23F8' : '\u25B6';
+  btn.classList.toggle('active', playing);
+  if (playing) {
+    // If at end, restart from beginning
+    if (currentIndex >= versionOrder.length - 1) {
+      goToVersion(0, false);
+    }
+    playTimer = setInterval(() => {
+      if (currentIndex < versionOrder.length - 1) {
+        goToVersion(currentIndex + 1, true);
+      } else {
+        togglePlay();
+      }
+    }, PLAY_SPEED);
+  } else {
+    clearInterval(playTimer);
+  }
+}
+
+// ============================================================
+// Scroll
+// ============================================================
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  targetScrollY += e.deltaY;
+  targetScrollY = Math.max(0, targetScrollY);
+  if (currentLayout) {
+    targetScrollY = Math.min(targetScrollY, Math.max(0, currentLayout.totalHeight - window.innerHeight + 100));
+  }
+}, { passive: false });
+
+// ============================================================
+// Init
+// ============================================================
+async function init() {
+  const versionFiles = ['1.0', '1.1', '1.2', '1.3'];
+
+  // Load all knots files
+  await Promise.all(versionFiles.map(async v => {
+    const resp = await fetch(`data/exocap.${v}.knots.md`);
+    allVersions[v] = parseKnots(await resp.text());
+  }));
+
+  versionOrder = versionFiles;
+
+  // Pre-layout all versions with pretext
+  for (const v of versionOrder) {
+    allLayouts[v] = layoutVersion(allVersions[v], MAX_WIDTH);
+  }
+
+  // Build timeline markers
+  const markersEl = document.getElementById('timeline-markers');
+  versionOrder.forEach((v, i) => {
+    const marker = document.createElement('div');
+    marker.className = 'timeline-marker';
+    marker.style.left = versionOrder.length > 1
+      ? (i / (versionOrder.length - 1)) * 100 + '%' : '0%';
+    marker.title = 'v' + v;
+    marker.addEventListener('click', () => goToVersion(i, true));
+    markersEl.appendChild(marker);
+  });
+
+  document.getElementById('timeline-bar').addEventListener('click', (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pct = (e.clientX - rect.left) / rect.width;
+    goToVersion(Math.round(pct * (versionOrder.length - 1)), true);
+  });
+
+  document.getElementById('btn-prev').addEventListener('click', () => goToVersion(currentIndex - 1, true));
+  document.getElementById('btn-next').addEventListener('click', () => goToVersion(currentIndex + 1, true));
+  document.getElementById('btn-play').addEventListener('click', togglePlay);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') goToVersion(currentIndex - 1, true);
+    if (e.key === 'ArrowRight') goToVersion(currentIndex + 1, true);
+    if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+  });
+
+  goToVersion(0, false);
+  requestAnimationFrame(drawFrame);
+}
+
+init();
+</script>
+</body>
+</html>

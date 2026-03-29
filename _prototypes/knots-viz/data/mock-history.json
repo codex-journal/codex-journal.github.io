@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "doc": "essay",
+  "exported_at": "2026-03-28T12:00:00Z",
+  "occurrences": [
+    {
+      "occurrence_id": "o_title",
+      "doc": "essay",
+      "created_at": "2026-03-01T00:00:00Z",
+      "created_by": "draft-1",
+      "final_state": "live",
+      "final_revision_id": "r_title_2",
+      "final_container": "root",
+      "final_order_key": "a",
+      "transition_count": 2
+    },
+    {
+      "occurrence_id": "o_p1",
+      "doc": "essay",
+      "created_at": "2026-03-01T00:00:30Z",
+      "created_by": "draft-1",
+      "final_state": "live",
+      "final_revision_id": "r_p1",
+      "final_container": "root",
+      "final_order_key": "b",
+      "transition_count": 1
+    },
+    {
+      "occurrence_id": "o_s1",
+      "doc": "essay",
+      "created_at": "2026-03-01T00:01:00Z",
+      "created_by": "draft-1",
+      "final_state": "live",
+      "final_revision_id": "r_s1_3",
+      "final_container": "o_p1",
+      "final_order_key": "a",
+      "transition_count": 3
+    },
+    {
+      "occurrence_id": "o_s2",
+      "doc": "essay",
+      "created_at": "2026-03-01T00:02:00Z",
+      "created_by": "draft-1",
+      "final_state": "live",
+      "final_revision_id": "r_s2_2",
+      "final_container": "o_p1",
+      "final_order_key": "b",
+      "transition_count": 2
+    },
+    {
+      "occurrence_id": "o_h2",
+      "doc": "essay",
+      "created_at": "2026-03-02T10:00:00Z",
+      "created_by": "editor-1",
+      "final_state": "live",
+      "final_revision_id": "r_h2_1",
+      "final_container": "root",
+      "final_order_key": "c",
+      "transition_count": 1
+    },
+    {
+      "occurrence_id": "o_p2",
+      "doc": "essay",
+      "created_at": "2026-03-01T00:02:30Z",
+      "created_by": "draft-1",
+      "final_state": "live",
+      "final_revision_id": "r_p2",
+      "final_container": "root",
+      "final_order_key": "d",
+      "transition_count": 1
+    },
+    {
+      "occurrence_id": "o_s3",
+      "doc": "essay",
+      "created_at": "2026-03-01T00:03:00Z",
+      "created_by": "draft-1",
+      "final_state": "live",
+      "final_revision_id": "r_s3_1",
+      "final_container": "o_p2",
+      "final_order_key": "a",
+      "transition_count": 1
+    },
+    {
+      "occurrence_id": "o_s4",
+      "doc": "essay",
+      "created_at": "2026-03-02T10:30:00Z",
+      "created_by": "editor-1",
+      "final_state": "live",
+      "final_revision_id": "r_s4_2",
+      "final_container": "o_p2",
+      "final_order_key": "b",
+      "transition_count": 2
+    },
+    {
+      "occurrence_id": "o_p3",
+      "doc": "essay",
+      "created_at": "2026-03-01T00:04:00Z",
+      "created_by": "draft-1",
+      "final_state": "live",
+      "final_revision_id": "r_p3",
+      "final_container": "root",
+      "final_order_key": "e",
+      "transition_count": 1
+    },
+    {
+      "occurrence_id": "o_s5",
+      "doc": "essay",
+      "created_at": "2026-03-01T00:05:00Z",
+      "created_by": "draft-1",
+      "final_state": "live",
+      "final_revision_id": "r_s5_1",
+      "final_container": "o_p3",
+      "final_order_key": "a",
+      "transition_count": 1
+    },
+    {
+      "occurrence_id": "o_s6",
+      "doc": "essay",
+      "created_at": "2026-03-03T08:30:00Z",
+      "created_by": "editor-1",
+      "final_state": "live",
+      "final_revision_id": "r_s6_1",
+      "final_container": "o_p3",
+      "final_order_key": "b",
+      "transition_count": 1
+    },
+    {
+      "occurrence_id": "o_s7",
+      "doc": "essay",
+      "created_at": "2026-03-01T00:04:30Z",
+      "created_by": "draft-1",
+      "final_state": "removed",
+      "final_revision_id": null,
+      "final_container": null,
+      "final_order_key": null,
+      "transition_count": 2
+    }
+  ],
+  "transitions": [
+    { "occurrence_id": "o_title", "event_id": "ev_001", "op": "place", "new_revision_id": "r_title_1", "new_container": "root", "new_order_key": "a", "agent": "draft-1", "ts": "2026-03-01T00:00:00Z" },
+    { "occurrence_id": "o_p1", "event_id": "ev_002", "op": "place", "new_revision_id": "r_p1", "new_container": "root", "new_order_key": "b", "agent": "draft-1", "ts": "2026-03-01T00:00:30Z" },
+    { "occurrence_id": "o_s1", "event_id": "ev_003", "op": "place", "new_revision_id": "r_s1_1", "new_container": "o_p1", "new_order_key": "a", "agent": "draft-1", "ts": "2026-03-01T00:01:00Z" },
+    { "occurrence_id": "o_s2", "event_id": "ev_004", "op": "place", "new_revision_id": "r_s2_1", "new_container": "o_p1", "new_order_key": "b", "agent": "draft-1", "ts": "2026-03-01T00:02:00Z" },
+    { "occurrence_id": "o_p2", "event_id": "ev_005", "op": "place", "new_revision_id": "r_p2", "new_container": "root", "new_order_key": "d", "agent": "draft-1", "ts": "2026-03-01T00:02:30Z" },
+    { "occurrence_id": "o_s3", "event_id": "ev_006", "op": "place", "new_revision_id": "r_s3_1", "new_container": "o_p2", "new_order_key": "a", "agent": "draft-1", "ts": "2026-03-01T00:03:00Z" },
+    { "occurrence_id": "o_p3", "event_id": "ev_007", "op": "place", "new_revision_id": "r_p3", "new_container": "root", "new_order_key": "e", "agent": "draft-1", "ts": "2026-03-01T00:04:00Z" },
+    { "occurrence_id": "o_s7", "event_id": "ev_008", "op": "place", "new_revision_id": "r_s7_1", "new_container": "o_p3", "new_order_key": "a", "agent": "draft-1", "ts": "2026-03-01T00:04:30Z" },
+    { "occurrence_id": "o_s5", "event_id": "ev_009", "op": "place", "new_revision_id": "r_s5_1", "new_container": "o_p3", "new_order_key": "b", "agent": "draft-1", "ts": "2026-03-01T00:05:00Z" },
+
+    { "occurrence_id": "o_title", "event_id": "ev_010", "op": "retarget", "old_revision_id": "r_title_1", "new_revision_id": "r_title_2", "agent": "editor-1", "ts": "2026-03-02T09:00:00Z" },
+    { "occurrence_id": "o_s1", "event_id": "ev_011", "op": "retarget", "old_revision_id": "r_s1_1", "new_revision_id": "r_s1_2", "agent": "editor-1", "ts": "2026-03-02T09:30:00Z" },
+    { "occurrence_id": "o_h2", "event_id": "ev_012", "op": "place", "new_revision_id": "r_h2_1", "new_container": "root", "new_order_key": "c", "agent": "editor-1", "ts": "2026-03-02T10:00:00Z" },
+    { "occurrence_id": "o_s4", "event_id": "ev_013", "op": "place", "new_revision_id": "r_s4_1", "new_container": "o_p2", "new_order_key": "b", "agent": "editor-1", "ts": "2026-03-02T10:30:00Z" },
+    { "occurrence_id": "o_s2", "event_id": "ev_014", "op": "retarget", "old_revision_id": "r_s2_1", "new_revision_id": "r_s2_2", "agent": "editor-1", "ts": "2026-03-02T11:00:00Z" },
+    { "occurrence_id": "o_s7", "event_id": "ev_015", "op": "remove", "agent": "editor-1", "ts": "2026-03-02T11:30:00Z" },
+
+    { "occurrence_id": "o_s1", "event_id": "ev_020", "op": "retarget", "old_revision_id": "r_s1_2", "new_revision_id": "r_s1_3", "agent": "editor-1", "ts": "2026-03-03T08:00:00Z" },
+    { "occurrence_id": "o_s6", "event_id": "ev_021", "op": "place", "new_revision_id": "r_s6_1", "new_container": "o_p3", "new_order_key": "b", "agent": "editor-1", "ts": "2026-03-03T08:30:00Z" },
+    { "occurrence_id": "o_s5", "event_id": "ev_022", "op": "move", "old_container": "o_p3", "new_container": "o_p3", "old_order_key": "b", "new_order_key": "c", "agent": "editor-1", "ts": "2026-03-03T08:45:00Z" },
+    { "occurrence_id": "o_s4", "event_id": "ev_023", "op": "retarget", "old_revision_id": "r_s4_1", "new_revision_id": "r_s4_2", "agent": "editor-1", "ts": "2026-03-03T09:00:00Z" }
+  ],
+  "revisions": [
+    { "revision_id": "r_title_1", "semantic_id": "s_title", "type": "h1", "content": "Capital and Computation", "op": "create", "derived_from": [], "agent": "draft-1", "ts": "2026-03-01T00:00:00Z" },
+    { "revision_id": "r_title_2", "semantic_id": "s_title", "type": "h1", "content": "Capital and Computation: Dependence as Power", "op": "revise", "derived_from": ["r_title_1"], "agent": "editor-1", "ts": "2026-03-02T09:00:00Z" },
+    { "revision_id": "r_p1", "semantic_id": "s_p1", "type": "p", "content": "", "op": "create", "derived_from": [], "agent": "draft-1", "ts": "2026-03-01T00:00:30Z" },
+    { "revision_id": "r_p2", "semantic_id": "s_p2", "type": "p", "content": "", "op": "create", "derived_from": [], "agent": "draft-1", "ts": "2026-03-01T00:02:30Z" },
+    { "revision_id": "r_p3", "semantic_id": "s_p3", "type": "p", "content": "", "op": "create", "derived_from": [], "agent": "draft-1", "ts": "2026-03-01T00:04:00Z" },
+    { "revision_id": "r_s1_1", "semantic_id": "s_s1", "type": "s", "content": "Every example in the talk turned on articulated dependence: the value chain, the layered contracts of the data center, the Nvidia-OpenAI-Microsoft circuit.", "op": "create", "derived_from": [], "agent": "draft-1", "ts": "2026-03-01T00:01:00Z" },
+    { "revision_id": "r_s1_2", "semantic_id": "s_s1", "type": "s", "content": "Every example in the talk turned on articulated dependence: the value chain, the layered contracts of the data center, the Nvidia-OpenAI-Microsoft circuit. These are computational structures in a real sense.", "op": "revise", "derived_from": ["r_s1_1"], "agent": "editor-1", "ts": "2026-03-02T09:30:00Z" },
+    { "revision_id": "r_s1_3", "semantic_id": "s_s1", "type": "s", "content": "Every example in the talk turned on articulated dependence: the value chain, the layered contracts of the data center, the Nvidia-OpenAI-Microsoft circuit. These are computational structures in a real sense: abstractions written into contracts, credits, scheduling layers, and vendor loops that can be modeled, optimized, and recursively recombined.", "op": "revise", "derived_from": ["r_s1_2"], "agent": "editor-1", "ts": "2026-03-03T08:00:00Z" },
+    { "revision_id": "r_s2_1", "semantic_id": "s_s2", "type": "s", "content": "But their computational legibility holds only at the uppermost hyperscaler layer.", "op": "create", "derived_from": [], "agent": "draft-1", "ts": "2026-03-01T00:02:00Z" },
+    { "revision_id": "r_s2_2", "semantic_id": "s_s2", "type": "s", "content": "But their computational legibility holds most cleanly only at the uppermost hyperscaler layer, where dependence can still appear as elastic interconnection rather than terminal reliance.", "op": "revise", "derived_from": ["r_s2_1"], "agent": "editor-1", "ts": "2026-03-02T11:00:00Z" },
+    { "revision_id": "r_s3_1", "semantic_id": "s_s3", "type": "s", "content": "Lift becomes incoherent at exactly this point, because the abstraction is real but partial: capital does not escape dependence here so much as displace it downward and outward.", "op": "create", "derived_from": [], "agent": "draft-1", "ts": "2026-03-01T00:03:00Z" },
+    { "revision_id": "r_s4_1", "semantic_id": "s_s4", "type": "s", "content": "Capital embeds itself more deeply in labor, infrastructure, sovereignty, and social reproduction while narrating that embedment as autonomy.", "op": "create", "derived_from": [], "agent": "editor-1", "ts": "2026-03-02T10:30:00Z" },
+    { "revision_id": "r_s4_2", "semantic_id": "s_s4", "type": "s", "content": "Capital embeds itself more deeply in labor, infrastructure, sovereignty, and social reproduction while narrating that embedment as autonomy. For capital, dependence, however it may be wrought, not independence, produces power.", "op": "revise", "derived_from": ["r_s4_1"], "agent": "editor-1", "ts": "2026-03-03T09:00:00Z" },
+    { "revision_id": "r_s5_1", "semantic_id": "s_s5", "type": "s", "content": "The talk never touched the book's most abstract and interesting claim; its closing pages name that horizon only in mystical form.", "op": "create", "derived_from": [], "agent": "draft-1", "ts": "2026-03-01T00:05:00Z" },
+    { "revision_id": "r_s6_1", "semantic_id": "s_s6", "type": "s", "content": "There, capital begins to shrug off its entrapments in social reproduction, thin into higher dimensions, and leave the sphere of human affairs behind until it disappears from sight.", "op": "create", "derived_from": [], "agent": "editor-1", "ts": "2026-03-03T08:30:00Z" },
+    { "revision_id": "r_s7_1", "semantic_id": "s_s7", "type": "s", "content": "This paragraph was a false start and will be removed in the next editing pass.", "op": "create", "derived_from": [], "agent": "draft-1", "ts": "2026-03-01T00:04:30Z" },
+    { "revision_id": "r_h2_1", "semantic_id": "s_h2", "type": "h2", "content": "Dependence as Structure", "op": "create", "derived_from": [], "agent": "editor-1", "ts": "2026-03-02T10:00:00Z" }
+  ],
+  "derivation_edges": [
+    { "parent": "r_title_1", "child": "r_title_2" },
+    { "parent": "r_s1_1", "child": "r_s1_2" },
+    { "parent": "r_s1_2", "child": "r_s1_3" },
+    { "parent": "r_s2_1", "child": "r_s2_2" },
+    { "parent": "r_s4_1", "child": "r_s4_2" }
+  ],
+  "links": []
+}

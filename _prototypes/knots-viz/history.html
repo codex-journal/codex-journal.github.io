@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Knots Compositional History</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a0f;
+  color: #ccc;
+  font-family: 'EB Garamond', Georgia, serif;
+  padding-bottom: 5rem;
+}
+
+/* --- Transport --- */
+.transport {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(10, 10, 15, 0.95);
+  border-top: 1px solid #222;
+  padding: 0.6rem 2rem;
+  z-index: 200;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.transport button {
+  font-family: inherit;
+  font-size: 13px;
+  background: none;
+  border: 1px solid #444;
+  color: #aaa;
+  padding: 0.25rem 0.7rem;
+  cursor: pointer;
+  border-radius: 2px;
+  min-width: 2.2rem;
+  text-align: center;
+}
+.transport button:hover { border-color: #daa520; color: #daa520; }
+.transport button.active { background: #daa520; color: #0a0a0f; border-color: #daa520; }
+
+.scrubber {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #333;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+.scrubber::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: #daa520;
+  cursor: pointer;
+}
+
+.transport-info {
+  color: #888;
+  min-width: 14rem;
+  text-align: right;
+  white-space: nowrap;
+}
+.transport-info .ev { color: #daa520; }
+.transport-info .op-place { color: #5cb85c; }
+.transport-info .op-retarget { color: #daa520; }
+.transport-info .op-move { color: #7d9bca; }
+.transport-info .op-remove { color: #c0392b; }
+
+/* --- Title bar --- */
+.title-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  padding: 0.8rem 2rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: #444;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  z-index: 100;
+  background: rgba(10, 10, 15, 0.9);
+  display: flex;
+  justify-content: space-between;
+}
+.event-meta {
+  color: #555;
+  font-size: 10px;
+}
+.event-meta .agent { color: #7d9bca; }
+.event-meta .ts { color: #666; }
+
+/* --- Content --- */
+.content {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 3rem 2rem 5rem;
+}
+
+/* --- Block elements --- */
+.block {
+  transition: opacity 0.5s ease, background-color 0.8s ease, max-height 0.5s ease;
+  position: relative;
+  overflow: hidden;
+}
+.block.entering {
+  animation: blockEnter 0.8s ease forwards;
+}
+.block.exiting {
+  animation: blockExit 0.5s ease forwards;
+}
+.block.retargeted {
+  animation: blockRetarget 1.2s ease forwards;
+}
+.block.moved {
+  animation: blockMove 1s ease forwards;
+}
+.block.stable {
+  opacity: 1;
+}
+.block.pending {
+  display: none;
+}
+
+@keyframes blockEnter {
+  0% { opacity: 0; background: rgba(92, 184, 92, 0.08); transform: translateX(-8px); }
+  40% { opacity: 1; background: rgba(92, 184, 92, 0.08); transform: translateX(0); }
+  100% { opacity: 1; background: transparent; transform: translateX(0); }
+}
+@keyframes blockExit {
+  0% { opacity: 1; background: rgba(192, 57, 43, 0.1); }
+  100% { opacity: 0; max-height: 0; margin: 0; padding: 0; background: rgba(192, 57, 43, 0.1); }
+}
+@keyframes blockRetarget {
+  0% { background: transparent; }
+  15% { background: rgba(218, 165, 32, 0.1); }
+  70% { background: rgba(218, 165, 32, 0.06); }
+  100% { background: transparent; }
+}
+@keyframes blockMove {
+  0% { background: transparent; border-left-color: transparent; }
+  20% { background: rgba(125, 155, 202, 0.08); border-left-color: #7d9bca; }
+  80% { background: rgba(125, 155, 202, 0.05); border-left-color: #7d9bca; }
+  100% { background: transparent; border-left-color: transparent; }
+}
+
+/* --- Typography --- */
+.block-paragraph {
+  line-height: 1.75;
+  font-size: 1.1rem;
+  margin-bottom: 1.3em;
+  text-align: justify;
+  hyphens: auto;
+  padding-left: 0.8rem;
+  border-left: 2px solid transparent;
+}
+.block-sentence {
+  line-height: 1.75;
+  font-size: 1.1rem;
+  margin-bottom: 1.3em;
+  text-align: justify;
+  hyphens: auto;
+  padding-left: 0.8rem;
+  border-left: 2px solid transparent;
+}
+.sentence {
+  display: inline;
+  transition: color 0.6s, background-color 0.8s, opacity 0.6s;
+  border-radius: 2px;
+  padding: 1px 0;
+}
+.sentence.entering { animation: fadeIn 0.8s ease forwards; }
+.sentence.retargeted { animation: modFlash 1.2s ease forwards; }
+.sentence.moved { animation: blockMove 1s ease forwards; }
+.sentence.exiting { animation: fadeOut 0.5s ease forwards; }
+.sentence.stable { opacity: 1; }
+.sentence:hover { background: rgba(218, 165, 32, 0.06); }
+.sid {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 7px;
+  color: #2a2a2a;
+  margin-left: 1px;
+  margin-right: 3px;
+  user-select: none;
+  transition: color 0.3s;
+  line-height: 0;
+}
+.sentence:hover .sid { color: #daa520; }
+.block-heading {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #1a1a1a;
+  padding-left: 0.8rem;
+  border-left: 2px solid transparent;
+}
+.block-heading.h1 { font-size: 0.95rem; color: #888; border-top: none; }
+.block-heading.h2 { font-size: 0.8rem; color: #666; }
+
+/* --- Occurrence ID gutter --- */
+.occ-id {
+  position: absolute;
+  left: -3.5rem;
+  top: 0.2rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 7px;
+  color: #222;
+  user-select: none;
+  transition: color 0.3s;
+}
+.block:hover .occ-id { color: #daa520; }
+
+/* --- Derivation marker --- */
+.derivation {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px;
+  color: #444;
+  margin-top: -0.8em;
+  margin-bottom: 0.5em;
+  padding-left: 0.8rem;
+}
+.derivation .arrow { color: #daa520; }
+
+/* --- Event indicator flash --- */
+.event-flash {
+  position: fixed;
+  top: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  padding: 0.3rem 1rem;
+  border-radius: 2px;
+  z-index: 150;
+  pointer-events: none;
+  animation: flashFade 1.5s ease forwards;
+}
+.event-flash.place { color: #5cb85c; background: rgba(92, 184, 92, 0.1); border: 1px solid rgba(92, 184, 92, 0.2); }
+.event-flash.retarget { color: #daa520; background: rgba(218, 165, 32, 0.1); border: 1px solid rgba(218, 165, 32, 0.2); }
+.event-flash.move { color: #7d9bca; background: rgba(125, 155, 202, 0.1); border: 1px solid rgba(125, 155, 202, 0.2); }
+.event-flash.remove { color: #c0392b; background: rgba(192, 57, 43, 0.1); border: 1px solid rgba(192, 57, 43, 0.2); }
+
+@keyframes flashFade {
+  0% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* --- Speed control --- */
+.speed-control {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #555;
+  font-size: 10px;
+}
+.speed-control button {
+  font-size: 10px;
+  padding: 0.15rem 0.4rem;
+  min-width: 0;
+}
+</style>
+</head>
+<body>
+
+<div class="title-bar">
+  <span>Compositional History</span>
+  <span class="event-meta" id="event-meta"></span>
+</div>
+
+<div class="content" id="content"></div>
+
+<div class="transport">
+  <button id="btn-start" title="Start">&#9198;</button>
+  <button id="btn-prev" title="Previous event">&#9664;</button>
+  <button id="btn-play" title="Play/Pause">&#9654;</button>
+  <button id="btn-next" title="Next event">&#9654;</button>
+  <button id="btn-end" title="End">&#9197;</button>
+  <input type="range" class="scrubber" id="scrubber" min="0" value="0">
+  <div class="speed-control">
+    <button id="btn-slower">-</button>
+    <span id="speed-label">1x</span>
+    <button id="btn-faster">+</button>
+  </div>
+  <div class="transport-info" id="transport-info"></div>
+</div>
+
+<script>
+// ============================================================
+// State
+// ============================================================
+let history = null;
+let transitions = [];
+let revisionMap = new Map();    // revision_id -> revision
+let currentEventIndex = -1;     // -1 = empty document
+let playing = false;
+let playTimer = null;
+let playSpeed = 1500;           // ms between events
+
+// Document state: occurrence_id -> { revision_id, container, order_key, alive }
+let docState = new Map();
+
+// ============================================================
+// Load
+// ============================================================
+async function loadHistory() {
+  const resp = await fetch('data/mock-history.json');
+  history = await resp.json();
+
+  // Sort transitions by event_id
+  transitions = history.transitions.sort((a, b) => a.event_id.localeCompare(b.event_id));
+
+  // Build revision map
+  for (const r of history.revisions) {
+    revisionMap.set(r.revision_id, r);
+  }
+
+  document.getElementById('scrubber').max = transitions.length;
+  document.getElementById('scrubber').value = 0;
+}
+
+// ============================================================
+// Apply / unapply transitions
+// ============================================================
+function applyTransition(t) {
+  const occ = docState.get(t.occurrence_id) || { revision_id: null, container: null, order_key: null, alive: false };
+
+  switch (t.op) {
+    case 'place':
+      occ.revision_id = t.new_revision_id;
+      occ.container = t.new_container;
+      occ.order_key = t.new_order_key;
+      occ.alive = true;
+      break;
+    case 'retarget':
+      occ.revision_id = t.new_revision_id;
+      break;
+    case 'move':
+      occ.container = t.new_container;
+      occ.order_key = t.new_order_key;
+      break;
+    case 'remove':
+      occ.alive = false;
+      break;
+  }
+
+  docState.set(t.occurrence_id, occ);
+}
+
+function buildStateAtIndex(targetIndex) {
+  docState.clear();
+  for (let i = 0; i <= targetIndex; i++) {
+    applyTransition(transitions[i]);
+  }
+}
+
+// ============================================================
+// Render document from state
+// ============================================================
+function renderDocument(animOp, animOccId) {
+  const container = document.getElementById('content');
+
+  // Build tree: root children sorted by order_key, paragraph children sorted by order_key
+  const rootChildren = [];
+  const childrenOf = new Map(); // container_occ_id -> [child states]
+
+  for (const [occId, state] of docState) {
+    if (!state.alive) continue;
+    const parentKey = state.container;
+    if (parentKey === 'root') {
+      rootChildren.push({ occId, ...state });
+    } else {
+      if (!childrenOf.has(parentKey)) childrenOf.set(parentKey, []);
+      childrenOf.get(parentKey).push({ occId, ...state });
+    }
+  }
+
+  rootChildren.sort((a, b) => a.order_key.localeCompare(b.order_key));
+  for (const [, children] of childrenOf) {
+    children.sort((a, b) => a.order_key.localeCompare(b.order_key));
+  }
+
+  const frag = document.createDocumentFragment();
+
+  for (const occ of rootChildren) {
+    const rev = revisionMap.get(occ.revision_id);
+    if (!rev) continue;
+
+    const isAnimTarget = occ.occId === animOccId;
+
+    if (rev.type === 'h1' || rev.type === 'h2') {
+      // Heading
+      const el = document.createElement('div');
+      el.className = `block block-heading ${rev.type}`;
+      el.dataset.occId = occ.occId;
+      el.classList.add(isAnimTarget && animOp ? getAnimClass(animOp) : 'stable');
+
+      const label = document.createElement('span');
+      label.className = 'occ-id';
+      label.textContent = occ.occId.replace('o_', '');
+      el.appendChild(label);
+      el.appendChild(document.createTextNode(rev.content));
+      frag.appendChild(el);
+
+    } else if (rev.type === 'p') {
+      // Paragraph container — render children as inline sentences
+      const p = document.createElement('p');
+      p.className = 'block block-paragraph';
+      p.dataset.occId = occ.occId;
+      p.classList.add(isAnimTarget && animOp ? getAnimClass(animOp) : 'stable');
+
+      const label = document.createElement('span');
+      label.className = 'occ-id';
+      label.textContent = occ.occId.replace('o_', '');
+      p.appendChild(label);
+
+      const children = childrenOf.get(occ.occId) || [];
+      for (const child of children) {
+        const childRev = revisionMap.get(child.revision_id);
+        if (!childRev) continue;
+
+        const isChildAnim = child.occId === animOccId;
+        const span = document.createElement('span');
+        span.className = 'sentence';
+        span.dataset.occId = child.occId;
+        span.classList.add(isChildAnim && animOp ? getAnimClass(animOp) : 'stable');
+        span.textContent = childRev.content + ' ';
+
+        const sid = document.createElement('sup');
+        sid.className = 'sid';
+        sid.textContent = child.occId.replace('o_', '');
+        span.appendChild(sid);
+
+        p.appendChild(span);
+      }
+
+      frag.appendChild(p);
+
+    } else {
+      // Standalone sentence at root level (shouldn't normally happen with proper containment)
+      const el = document.createElement('p');
+      el.className = 'block block-sentence';
+      el.dataset.occId = occ.occId;
+      el.classList.add(isAnimTarget && animOp ? getAnimClass(animOp) : 'stable');
+
+      const label = document.createElement('span');
+      label.className = 'occ-id';
+      label.textContent = occ.occId.replace('o_', '');
+      el.appendChild(label);
+      el.appendChild(document.createTextNode(rev.content));
+      frag.appendChild(el);
+    }
+  }
+
+  // Remove animation
+  if (animOp === 'remove' && animOccId) {
+    const existing = container.querySelector(`[data-occ-id="${animOccId}"]`);
+    if (existing) {
+      existing.classList.remove('stable');
+      existing.classList.add('exiting');
+      setTimeout(() => {
+        container.innerHTML = '';
+        container.appendChild(frag);
+      }, 500);
+      return;
+    }
+  }
+
+  container.innerHTML = '';
+  container.appendChild(frag);
+}
+
+function getAnimClass(op) {
+  switch (op) {
+    case 'place': return 'entering';
+    case 'retarget': return 'retargeted';
+    case 'move': return 'moved';
+    case 'remove': return 'exiting';
+    default: return 'stable';
+  }
+}
+
+// ============================================================
+// Navigation
+// ============================================================
+function goToEvent(index, animate = true) {
+  index = Math.max(-1, Math.min(index, transitions.length - 1));
+
+  const prevIndex = currentEventIndex;
+  currentEventIndex = index;
+
+  buildStateAtIndex(index);
+
+  let animOp = null;
+  let animOccId = null;
+
+  if (animate && index >= 0 && index !== prevIndex) {
+    const t = transitions[index];
+    animOp = t.op;
+    animOccId = t.occurrence_id;
+
+    // Flash indicator
+    showFlash(t);
+  }
+
+  renderDocument(animOp, animOccId);
+  updateTransport();
+}
+
+function showFlash(t) {
+  const existing = document.querySelectorAll('.event-flash');
+  existing.forEach(el => el.remove());
+
+  const flash = document.createElement('div');
+  flash.className = `event-flash ${t.op}`;
+
+  const rev = t.new_revision_id ? revisionMap.get(t.new_revision_id) : null;
+  const preview = rev ? rev.content.substring(0, 50) + (rev.content.length > 50 ? '...' : '') : '';
+
+  flash.textContent = `${t.op} ${t.occurrence_id.replace('o_', '')}${preview ? ' — ' + preview : ''}`;
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 1600);
+}
+
+function updateTransport() {
+  const scrubber = document.getElementById('scrubber');
+  scrubber.value = currentEventIndex + 1;
+
+  const info = document.getElementById('transport-info');
+  if (currentEventIndex < 0) {
+    info.innerHTML = '<span class="ev">empty</span>';
+    document.getElementById('event-meta').innerHTML = '';
+  } else {
+    const t = transitions[currentEventIndex];
+    const opClass = `op-${t.op}`;
+    info.innerHTML = `<span class="ev">${currentEventIndex + 1}/${transitions.length}</span> &middot; <span class="${opClass}">${t.op}</span> ${t.occurrence_id.replace('o_', '')}`;
+
+    document.getElementById('event-meta').innerHTML =
+      `<span class="agent">${t.agent}</span> &middot; <span class="ts">${t.ts.substring(0, 16).replace('T', ' ')}</span>`;
+  }
+}
+
+// ============================================================
+// Playback
+// ============================================================
+function togglePlay() {
+  playing = !playing;
+  const btn = document.getElementById('btn-play');
+  btn.textContent = playing ? '\u23F8' : '\u25B6';
+  btn.classList.toggle('active', playing);
+
+  if (playing) {
+    if (currentEventIndex >= transitions.length - 1) {
+      goToEvent(-1, false);
+    }
+    advance();
+  } else {
+    clearTimeout(playTimer);
+  }
+}
+
+function advance() {
+  if (!playing) return;
+  if (currentEventIndex < transitions.length - 1) {
+    goToEvent(currentEventIndex + 1, true);
+    playTimer = setTimeout(advance, playSpeed);
+  } else {
+    togglePlay();
+  }
+}
+
+function setSpeed(mult) {
+  const speeds = [3000, 2000, 1500, 1000, 600, 300];
+  const labels = ['0.5x', '0.75x', '1x', '1.5x', '2x', '4x'];
+  const currentIdx = speeds.indexOf(playSpeed);
+  const newIdx = Math.max(0, Math.min(speeds.length - 1, currentIdx + mult));
+  playSpeed = speeds[newIdx];
+  document.getElementById('speed-label').textContent = labels[newIdx];
+}
+
+// ============================================================
+// Init
+// ============================================================
+async function init() {
+  await loadHistory();
+
+  // Transport
+  document.getElementById('btn-prev').addEventListener('click', () => goToEvent(currentEventIndex - 1, true));
+  document.getElementById('btn-next').addEventListener('click', () => goToEvent(currentEventIndex + 1, true));
+  document.getElementById('btn-play').addEventListener('click', togglePlay);
+  document.getElementById('btn-start').addEventListener('click', () => goToEvent(-1, false));
+  document.getElementById('btn-end').addEventListener('click', () => goToEvent(transitions.length - 1, false));
+  document.getElementById('btn-slower').addEventListener('click', () => setSpeed(-1));
+  document.getElementById('btn-faster').addEventListener('click', () => setSpeed(1));
+
+  document.getElementById('scrubber').addEventListener('input', (e) => {
+    goToEvent(parseInt(e.target.value) - 1, false);
+  });
+
+  // Keyboard
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') goToEvent(currentEventIndex - 1, true);
+    if (e.key === 'ArrowRight') goToEvent(currentEventIndex + 1, true);
+    if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+    if (e.key === 'Home') goToEvent(-1, false);
+    if (e.key === 'End') goToEvent(transitions.length - 1, false);
+  });
+
+  // Start empty
+  goToEvent(-1, false);
+}
+
+init();
+</script>
+</body>
+</html>

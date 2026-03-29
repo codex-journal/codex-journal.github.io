@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Knots Timeline — DOM</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a0f;
+  color: #ccc;
+  font-family: 'EB Garamond', Georgia, serif;
+  padding-bottom: 4rem;
+}
+
+/* --- Transport --- */
+.transport {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(10, 10, 15, 0.95);
+  border-top: 1px solid #222;
+  padding: 0.8rem 2rem;
+  z-index: 200;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.transport button {
+  font-family: inherit;
+  font-size: 14px;
+  background: none;
+  border: 1px solid #444;
+  color: #aaa;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+  border-radius: 2px;
+  min-width: 2.5rem;
+  text-align: center;
+}
+.transport button:hover { border-color: #daa520; color: #daa520; }
+.transport button.active { background: #daa520; color: #0a0a0f; border-color: #daa520; }
+
+.timeline-track {
+  flex: 1;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.timeline-bar {
+  width: 100%;
+  height: 2px;
+  background: #333;
+  position: relative;
+}
+.timeline-progress {
+  height: 100%;
+  background: #daa520;
+  width: 0%;
+  transition: width 0.3s;
+}
+.timeline-markers {
+  position: absolute;
+  top: -5px; left: 0; right: 0;
+  height: 12px;
+  pointer-events: none;
+}
+.timeline-marker {
+  position: absolute;
+  width: 10px; height: 10px;
+  background: #222;
+  border: 1px solid #666;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.timeline-marker.current { background: #daa520; border-color: #daa520; }
+
+.version-label {
+  color: #daa520;
+  min-width: 3rem;
+  text-align: center;
+  font-size: 13px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* --- Header --- */
+.title-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  padding: 1rem 2rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: #444;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  z-index: 100;
+  background: rgba(10, 10, 15, 0.9);
+}
+
+.stats {
+  position: fixed;
+  top: 1rem; right: 1.5rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: #555;
+  text-align: right;
+  line-height: 1.8;
+  z-index: 100;
+}
+.stats .n { color: #daa520; }
+.stats .added { color: #5cb85c; }
+.stats .removed { color: #c0392b; }
+.stats .modified { color: #daa520; }
+
+/* --- Content --- */
+.content {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 3.5rem 2rem 5rem;
+}
+
+/* --- Version watermark --- */
+.version-watermark {
+  position: fixed;
+  right: 2rem;
+  bottom: 5rem;
+  font-family: 'EB Garamond', serif;
+  font-size: 100px;
+  font-weight: 200;
+  color: rgba(218, 165, 32, 0.06);
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.3s;
+}
+
+/* --- Knots elements --- */
+.knot-paragraph {
+  margin-bottom: 1.3em;
+  text-align: justify;
+  hyphens: auto;
+  line-height: 1.75;
+  font-size: 1.1rem;
+  position: relative;
+}
+.knot-heading {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #1a1a1a;
+  transition: border-color 0.6s;
+}
+.knot-heading.h1 { font-size: 0.95rem; color: #888; border-top: none; }
+.knot-heading.h2 { font-size: 0.8rem; color: #666; }
+
+.knot-sentence {
+  display: inline;
+  position: relative;
+  transition: color 0.6s, background-color 0.8s, opacity 0.6s;
+  border-radius: 2px;
+  padding: 1px 0;
+}
+
+/* Diff animation states */
+.knot-sentence[data-state="entering"] {
+  animation: fadeIn 1s ease forwards;
+}
+.knot-sentence[data-state="exiting"] {
+  animation: fadeOut 0.6s ease forwards;
+  position: absolute;
+  pointer-events: none;
+}
+.knot-sentence[data-state="modified"] {
+  animation: modFlash 1.5s ease forwards;
+}
+.knot-sentence[data-state="stable"] {
+  color: #ccc;
+  background: transparent;
+}
+
+@keyframes fadeIn {
+  0% { color: transparent; background: rgba(92, 184, 92, 0.15); }
+  30% { color: #5cb85c; background: rgba(92, 184, 92, 0.1); }
+  100% { color: #ccc; background: transparent; }
+}
+@keyframes fadeOut {
+  0% { opacity: 1; color: #c0392b; }
+  100% { opacity: 0; color: #c0392b; }
+}
+@keyframes modFlash {
+  0% { background: transparent; color: #ccc; }
+  15% { background: rgba(218, 165, 32, 0.12); color: #daa520; }
+  70% { background: rgba(218, 165, 32, 0.08); color: #daa520; }
+  100% { background: transparent; color: #ccc; }
+}
+
+/* Version flash */
+@keyframes versionFlash {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+.version-flash {
+  position: fixed;
+  top: 3rem; left: 50%;
+  transform: translateX(-50%);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  color: #daa520;
+  letter-spacing: 0.1em;
+  z-index: 150;
+  animation: versionFlash 1.5s ease forwards;
+  pointer-events: none;
+}
+
+/* Sentence ID */
+.sid {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 7px;
+  color: #2a2a2a;
+  vertical-align: super;
+  margin-left: 2px;
+  user-select: none;
+  transition: color 0.3s;
+}
+.knot-sentence:hover { background: rgba(218, 165, 32, 0.06); }
+.knot-sentence:hover .sid { color: #daa520; }
+
+/* Paragraph-level removed ghost */
+.removed-ghost {
+  overflow: hidden;
+  max-height: 200px;
+  transition: max-height 0.6s ease, opacity 0.6s ease;
+  opacity: 0.4;
+}
+.removed-ghost.collapsing {
+  max-height: 0;
+  opacity: 0;
+}
+</style>
+</head>
+<body>
+
+<div class="title-bar">Knots Timeline &middot; DOM</div>
+<div class="stats" id="stats"></div>
+<div class="version-watermark" id="watermark"></div>
+<div class="content" id="content"></div>
+
+<div class="transport">
+  <button id="btn-prev">&#9664;</button>
+  <button id="btn-play">&#9654;</button>
+  <button id="btn-next">&#9654;</button>
+  <div class="timeline-track">
+    <div class="timeline-bar" id="timeline-bar">
+      <div class="timeline-progress" id="timeline-progress"></div>
+      <div class="timeline-markers" id="timeline-markers"></div>
+    </div>
+  </div>
+  <div class="version-label" id="version-display"></div>
+</div>
+
+<script>
+// ============================================================
+// Knots parser
+// ============================================================
+function parseKnots(text) {
+  const lines = text.split('\n');
+  const blocks = [];
+  let current = null;
+  for (const line of lines) {
+    const hm = line.match(/^\[([0-9a-f]{4}):(h[1-3])\]\s*(.*)/);
+    if (hm) {
+      current = { type: hm[2], id: hm[1], sentences: [{ id: hm[1], text: hm[3] }] };
+      blocks.push(current);
+      continue;
+    }
+    const pm = line.match(/^\[([0-9a-f]{4}):p\]/);
+    if (pm) {
+      current = { type: 'p', id: pm[1], sentences: [] };
+      blocks.push(current);
+      continue;
+    }
+    const sm = line.match(/^\s+\[([0-9a-f]{4}):s\]\s*(.*)/);
+    if (sm && current) {
+      current.sentences.push({ id: sm[1], text: sm[2] });
+      continue;
+    }
+    if (current && current.sentences.length > 0 && line.trim()) {
+      current.sentences[current.sentences.length - 1].text += ' ' + line.trim();
+    }
+  }
+  return blocks;
+}
+
+function cleanText(text) {
+  return text.replace(/@[\w]+/g, '').replace(/\[.*?\]/g, '').replace(/\{.*?\}/g, '').replace(/\^/g, '').replace(/\s+/g, ' ').trim();
+}
+
+// ============================================================
+// Diff
+// ============================================================
+function diffVersions(prevBlocks, currBlocks) {
+  const prevMap = new Map();
+  const currMap = new Map();
+  for (const b of prevBlocks) for (const s of b.sentences) prevMap.set(s.id, s.text);
+  for (const b of currBlocks) for (const s of b.sentences) currMap.set(s.id, s.text);
+
+  const added = new Set();
+  const removed = new Set();
+  const modified = new Set();
+
+  for (const [id, text] of currMap) {
+    if (!prevMap.has(id)) added.add(id);
+    else if (prevMap.get(id) !== text) modified.add(id);
+  }
+  for (const id of prevMap.keys()) {
+    if (!currMap.has(id)) removed.add(id);
+  }
+  return { added, removed, modified };
+}
+
+// ============================================================
+// DOM renderer
+// ============================================================
+function renderVersion(blocks, diff, container) {
+  // Snapshot removed elements for exit animation
+  const oldSentences = container.querySelectorAll('.knot-sentence[data-sid]');
+  const removedEls = [];
+  if (diff) {
+    for (const el of oldSentences) {
+      if (diff.removed.has(el.dataset.sid)) {
+        const rect = el.getBoundingClientRect();
+        removedEls.push({ sid: el.dataset.sid, text: el.textContent, rect });
+      }
+    }
+  }
+
+  container.innerHTML = '';
+
+  for (const block of blocks) {
+    if (block.type.startsWith('h')) {
+      const el = document.createElement('div');
+      el.className = `knot-heading ${block.type}`;
+      el.textContent = block.sentences[0]?.text || '';
+      container.appendChild(el);
+      continue;
+    }
+
+    const p = document.createElement('p');
+    p.className = 'knot-paragraph';
+
+    for (const s of block.sentences) {
+      const span = document.createElement('span');
+      span.className = 'knot-sentence';
+      span.dataset.sid = s.id;
+
+      let state = 'stable';
+      if (diff) {
+        if (diff.added.has(s.id)) state = 'entering';
+        else if (diff.modified.has(s.id)) state = 'modified';
+      }
+      span.dataset.state = state;
+
+      const clean = cleanText(s.text);
+      span.textContent = clean + ' ';
+
+      const sid = document.createElement('span');
+      sid.className = 'sid';
+      sid.textContent = s.id;
+      span.appendChild(sid);
+
+      p.appendChild(span);
+    }
+    container.appendChild(p);
+  }
+
+  // Flash removed sentences as ghosts
+  if (removedEls.length > 0) {
+    const ghost = document.createElement('div');
+    ghost.className = 'removed-ghost';
+    ghost.style.color = '#c0392b';
+    ghost.style.fontSize = '0.9rem';
+    ghost.style.marginBottom = '1em';
+    ghost.style.lineHeight = '1.6';
+    for (const r of removedEls) {
+      const span = document.createElement('span');
+      span.style.textDecoration = 'line-through';
+      span.textContent = r.text + ' ';
+      ghost.appendChild(span);
+    }
+    container.insertBefore(ghost, container.firstChild);
+    requestAnimationFrame(() => {
+      ghost.classList.add('collapsing');
+      setTimeout(() => ghost.remove(), 700);
+    });
+  }
+
+  // Version flash
+  const flash = document.createElement('div');
+  flash.className = 'version-flash';
+  flash.textContent = 'v' + versionOrder[currentIndex];
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 1600);
+}
+
+function updateStats(blocks, diff) {
+  let sentences = 0;
+  for (const b of blocks) if (b.type === 'p') sentences += b.sentences.length;
+  let html = `<span class="n">${versionOrder[currentIndex]}</span> &middot; ${sentences} sentences`;
+  if (diff) {
+    if (diff.added.size) html += ` &middot; <span class="added">+${diff.added.size}</span>`;
+    if (diff.modified.size) html += ` <span class="modified">~${diff.modified.size}</span>`;
+    if (diff.removed.size) html += ` <span class="removed">-${diff.removed.size}</span>`;
+  }
+  document.getElementById('stats').innerHTML = html;
+}
+
+// ============================================================
+// Timeline state
+// ============================================================
+const allVersions = {};
+let versionOrder = [];
+let currentIndex = 0;
+let playing = false;
+let playTimer = null;
+const PLAY_SPEED = 6000;
+
+function goToVersion(idx, animate = true) {
+  if (idx < 0 || idx >= versionOrder.length) return;
+  const prev = currentIndex;
+  currentIndex = idx;
+
+  const vn = versionOrder[idx];
+  let diff = null;
+  if (animate && prev !== idx && prev >= 0) {
+    diff = diffVersions(allVersions[versionOrder[prev]], allVersions[vn]);
+  }
+
+  renderVersion(allVersions[vn], diff, document.getElementById('content'));
+  updateStats(allVersions[vn], diff);
+  document.getElementById('watermark').textContent = 'v' + vn;
+  updateTransport();
+}
+
+function updateTransport() {
+  const pct = versionOrder.length > 1
+    ? (currentIndex / (versionOrder.length - 1)) * 100 : 0;
+  document.getElementById('timeline-progress').style.width = pct + '%';
+  document.getElementById('version-display').textContent = 'v' + versionOrder[currentIndex];
+  document.querySelectorAll('.timeline-marker').forEach((m, i) => {
+    m.classList.toggle('current', i === currentIndex);
+  });
+}
+
+function togglePlay() {
+  playing = !playing;
+  const btn = document.getElementById('btn-play');
+  btn.textContent = playing ? '\u23F8' : '\u25B6';
+  btn.classList.toggle('active', playing);
+  if (playing) {
+    if (currentIndex >= versionOrder.length - 1) goToVersion(0, false);
+    playTimer = setInterval(() => {
+      if (currentIndex < versionOrder.length - 1) {
+        goToVersion(currentIndex + 1, true);
+      } else {
+        togglePlay();
+      }
+    }, PLAY_SPEED);
+  } else {
+    clearInterval(playTimer);
+  }
+}
+
+// ============================================================
+// Init
+// ============================================================
+async function init() {
+  const versionFiles = ['1.0', '1.1', '1.2', '1.3'];
+
+  await Promise.all(versionFiles.map(async v => {
+    const resp = await fetch(`data/exocap.${v}.knots.md`);
+    allVersions[v] = parseKnots(await resp.text());
+  }));
+
+  versionOrder = versionFiles;
+
+  const markersEl = document.getElementById('timeline-markers');
+  versionOrder.forEach((v, i) => {
+    const marker = document.createElement('div');
+    marker.className = 'timeline-marker';
+    marker.style.left = versionOrder.length > 1
+      ? (i / (versionOrder.length - 1)) * 100 + '%' : '0%';
+    marker.title = 'v' + v;
+    marker.addEventListener('click', () => goToVersion(i, true));
+    markersEl.appendChild(marker);
+  });
+
+  document.getElementById('timeline-bar').addEventListener('click', (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pct = (e.clientX - rect.left) / rect.width;
+    goToVersion(Math.round(pct * (versionOrder.length - 1)), true);
+  });
+
+  document.getElementById('btn-prev').addEventListener('click', () => goToVersion(currentIndex - 1, true));
+  document.getElementById('btn-next').addEventListener('click', () => goToVersion(currentIndex + 1, true));
+  document.getElementById('btn-play').addEventListener('click', togglePlay);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') goToVersion(currentIndex - 1, true);
+    if (e.key === 'ArrowRight') goToVersion(currentIndex + 1, true);
+    if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+  });
+
+  goToVersion(0, false);
+}
+
+init();
+</script>
+</body>
+</html>
