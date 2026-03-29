@@ -4,15 +4,14 @@
 
 Poliks and Trillo present exocapitalism not as a new stage of capitalism
 but as a retroactive recognition: capital's axiomatic kernel, they
-argue, was always substrate-independent
-[@poliksExocapitalismEconomiesAbsolutely2025]. On this telling, capital
-is a germ, an algorithm, a small fissile mechanism organized around buy,
-hold, sell.
+argue, was always substrate-independent (Poliks and Trillo 2025). On
+this telling, capital is a germ, an algorithm, a small fissile mechanism
+organized around buy, hold, sell.
 
 Here that pitch appeared in public this past weekend at Index Space,
 where Poliks and Trillo applied it to AI infrastructure under the
-Baudrillard-nodding title "The Data Center Does Not Exist"
-[@baudrillardGulfWar1995].
+Baudrillard-nodding title "The Data Center Does Not Exist" (Baudrillard
+1995).
 
 In their idiom, the claim is presented not just as a theory of capital
 but as a cosmology: capitalism as wildcode, as "a nam-shub encoded into
@@ -58,11 +57,11 @@ allowed for the general recuperation of accelerationism into the Silicon
 Valley lexicon. What returns here is not Land's ecstatic image of
 runaway capital but a colder transcendentalized immanence: the same
 impersonal process, now stripped of libidinal charge and contemplated
-under the signs of indifference, deprecation, and abandonment
-[@landFangedNoumena2011]. The accelerationist debt enters where a
-historically specific monetary logic of capital---catastrophic,
-spread-seeking, arbitrage-driven---is projected across substrates and
-scales until it appears cosmic.
+under the signs of indifference, deprecation, and abandonment (Land
+2011). The accelerationist debt enters where a historically specific
+monetary logic of capital---catastrophic, spread-seeking,
+arbitrage-driven---is projected across substrates and scales until it
+appears cosmic.
 
 The talk, this past weekend at Index Space, the Walker St venue of
 Garden 3D[^1], drew a packed crowd, a sign that Poliks and Trillo can
@@ -113,10 +112,10 @@ social life at large. So a half-assed Baudrillardian bubble diagnosis is
 insufficient on its own. Historically, such speculative surges have not
 merely distorted value; they have augured---indeed, accelerated---an
 exponential expansion of the subsumptive surface of social life, labor
-above all [@perezTechnologicalRevolutionsFinancial2002]. Lacking a
-precise ontology of money, the talk could not stay with contracts,
-credit, and recursive financing; it slipped back to the surface, where
-the announced project seemed to generate value on its own.
+above all (Perez 2002). Lacking a precise ontology of money, the talk
+could not stay with contracts, credit, and recursive financing; it
+slipped back to the surface, where the announced project seemed to
+generate value on its own.
 
 What the talk named without fully theorizing was a temporal
 contradiction: capital's horizon of permanent transition had become
@@ -138,22 +137,21 @@ Yago's scheduled Q&A after P&T's brief lecture mattered less as
 clarification than as symptom. Her prompts moved through hype,
 glazing-as-a-service (?), prediction markets, and jankspace---Maya B.
 Kronic's term, after Koolhaas, for the low-grade, makeshift
-residue-space of technocapitalism
-[@felsteadMetaverseJankyCapitalism]---but in a vocabulary that already
-felt pre-digested by the downtown trend apparatus: not analysis so much
-as scene-language trying to keep pace with an object that no longer
-requires its mediation. The irony is that Polymarket, Kalshi, and the
-wider predictive-market discourse are not remote phenomena arriving from
-some alien technocultural elsewhere; they are part of New York's own
-contemporary technical-financial formation. What registered most clearly
-was anxiety: the downtown trend apparatus no longer seemed able to turn
-yesterday's residue into today's frontier, but only to repeat it in
-scene-language after more direct quantitative forms had already captured
-it. The city no longer narrates the transition from above, but suffers
-it from within; the discussion became most interesting precisely where
-that anxiety surfaced, because it suggested that the art-theoretical
-zeitgeist has not mastered the technocultural one, but is being eclipsed
-by it in its own home.
+residue-space of technocapitalism (Felstead and Leung, n.d.)---but in a
+vocabulary that already felt pre-digested by the downtown trend
+apparatus: not analysis so much as scene-language trying to keep pace
+with an object that no longer requires its mediation. The irony is that
+Polymarket, Kalshi, and the wider predictive-market discourse are not
+remote phenomena arriving from some alien technocultural elsewhere; they
+are part of New York's own contemporary technical-financial formation.
+What registered most clearly was anxiety: the downtown trend apparatus
+no longer seemed able to turn yesterday's residue into today's frontier,
+but only to repeat it in scene-language after more direct quantitative
+forms had already captured it. The city no longer narrates the
+transition from above, but suffers it from within; the discussion became
+most interesting precisely where that anxiety surfaced, because it
+suggested that the art-theoretical zeitgeist has not mastered the
+technocultural one, but is being eclipsed by it in its own home.
 
 Only in the impromptu Q&A, after Yago's scheduled session, did the
 theory meet direct argumentative pressure. The objection---"these are
@@ -251,12 +249,12 @@ but the medium through which economic perception occurs at all. Poliks
 and Trillo treat this surface as if it could be peeled away from the
 commodity world and left to float free, but for Kant the forms of
 intuition are nothing without the manifold they organize---the
-transcendental aesthetic without empirical content is empty
-[@kantCritiquePureReason1781]. Their need to eschew production
-altogether is what keeps the monetary surface clean, contemplable,
-sublime. The moment you reintroduce production---labor, commodities, the
-bio-social calendar---the surface gets dirty, entangled, historically
-mediated, and stops being a transcendental object.
+transcendental aesthetic without empirical content is empty (Kant 1781).
+Their need to eschew production altogether is what keeps the monetary
+surface clean, contemplable, sublime. The moment you reintroduce
+production---labor, commodities, the bio-social calendar---the surface
+gets dirty, entangled, historically mediated, and stops being a
+transcendental object.
 
 But the monetary surface is itself only a view---a projection over a
 more fundamental order of transactions and claims on future transactions
@@ -327,22 +325,21 @@ dependency map and declared the thing independent.
 The talk gestured toward a "post-transactional" world---the Polymarket
 example of betting on whether Chinese food will be delivered rather than
 ordering it---which was a half-formed appropriation of Suhail Malik's
-thesis of the derivative as ontologically prior to the spot price
-[@malikOntologyFinance2014]. Malik's argument is more exact than the use
-Poliks and Trillo make of it, but it remains too committed to
-price-as-primitive: the derivative intensifies the entanglement of
-price, abstraction, and power without thereby making price primitive to
-money as such. He draws on Nitzan and Bichler because the proliferation
-of derivatives makes the constitutive role of social power in price
-formation more explicit, not less [@nitzanCapitalPower2009]. Poliks and
-Trillo cite Malik but underread him, and the reason is clear: that
-fixation on price is catnip for an arbitrage-crazed ontology, because it
-lets the price-and-probability surface---things becoming
-derivative-like, statistical, post-transactional---stand in for value
-itself, a slippage the talk repeated whenever speculation, announcement
-effects, and market-cap moves were casually described as value
-generation. For Poliks and Trillo, the casino occludes the
-clearinghouse.
+thesis of the derivative as ontologically prior to the spot price (Malik
+2014). Malik's argument is more exact than the use Poliks and Trillo
+make of it, but it remains too committed to price-as-primitive: the
+derivative intensifies the entanglement of price, abstraction, and power
+without thereby making price primitive to money as such. He draws on
+Nitzan and Bichler because the proliferation of derivatives makes the
+constitutive role of social power in price formation more explicit, not
+less (Nitzan and Bichler 2009). Poliks and Trillo cite Malik but
+underread him, and the reason is clear: that fixation on price is catnip
+for an arbitrage-crazed ontology, because it lets the
+price-and-probability surface---things becoming derivative-like,
+statistical, post-transactional---stand in for value itself, a slippage
+the talk repeated whenever speculation, announcement effects, and
+market-cap moves were casually described as value generation. For Poliks
+and Trillo, the casino occludes the clearinghouse.
 
 The exocapitalist account collapses two distinct regimes of social
 computation into one. Classical computation---databases, trading
@@ -361,11 +358,11 @@ this the transductive subject: the human coordinating center through
 which use-values, frictions, and historical knowledge were translated
 into administrable form. The term is borrowed from Simondon only to
 break with him at the decisive point: his insistence that the living
-transducer remains ontologically privileged
-[@simondonModeExistenceObjets1958]. What matters about multi-modal AI is
-that it attacks this mediating layer directly: the social is the
-freshest material for computation, and language is the hinge through
-which capital attempts the real subsumption of that mediation.
+transducer remains ontologically privileged (Simondon 1958). What
+matters about multi-modal AI is that it attacks this mediating layer
+directly: the social is the freshest material for computation, and
+language is the hinge through which capital attempts the real
+subsumption of that mediation.
 
 The actual trajectory is therefore not "lift" but an attempted closure
 through computational mediation. Capital is not departing the material
@@ -415,7 +412,7 @@ configuration with conditions of emergence, internal contradictions, and
 a horizon of transformation. Jameson's postmodernism works as
 periodization because it is the cultural logic of late capitalism---tied
 to a specific mode of accumulation, a specific set of spatial practices
-[@jamesonPostmodernismCulturalLogic1991]. It has a floor and a ceiling.
+(Jameson 1991). It has a floor and a ceiling.
 
 Poliks and Trillo do the opposite: they take what functions as a
 periodizing insight and transcendentalize it. Capital was always this,
@@ -456,17 +453,17 @@ In the impromptu Q&A, one interlocutor sharpened the political vacuum by
 invoking Edelman's *No Future*---the queer polemic against reproductive
 futurism---noting that what had been theoretically forsaken as a
 political organizing principle might, under the conditions Poliks and
-Trillo describe, become necessity again [@edelmanNoFuture2004]. Poliks
-took it up without apparent irony, running directly into the
-reproductive futurism Edelman had dismantled: "I also have a kid---I see
-hope in that kid every single day." The exchange drifted to Minneapolis,
-where Poliks found hope in the neighborhood-scale mutual aid of the
-George Floyd protests---feeding each other, doing laundry, paying
-utility bills---but only at the city block, deteriorating above that
-scale. At that point, political transformation and neighborhood survival
-were left too close together to be cleanly distinguished. That was not
-incidental. For P&T, politics keeps shrinking into maintenance: feeding
-each other, doing laundry, paying the utility bill.
+Trillo describe, become necessity again (Edelman 2004). Poliks took it
+up without apparent irony, running directly into the reproductive
+futurism Edelman had dismantled: "I also have a kid---I see hope in that
+kid every single day." The exchange drifted to Minneapolis, where Poliks
+found hope in the neighborhood-scale mutual aid of the George Floyd
+protests---feeding each other, doing laundry, paying utility bills---but
+only at the city block, deteriorating above that scale. At that point,
+political transformation and neighborhood survival were left too close
+together to be cleanly distinguished. That was not incidental. For P&T,
+politics keeps shrinking into maintenance: feeding each other, doing
+laundry, paying the utility bill.
 
 Any hope adequate to such a condition would begin by making the
 dependency structures of social life legible with ruthless clarity and
@@ -474,31 +471,31 @@ end, if at all, in the collective power to rewrite them. But that
 interlocutor's intuition cut deeper than either of them realized. If
 history is itself becoming senescent---if the transductive subject is
 being deprecated and the commodity graph is becoming legible without
-human mediation---then the life drive [@aster-key] would reawaken not as
-ideology but as radical necessity. Otherwise reproduction would become
-what the exocapitalist ontology already implies it to be: a luxury, a
-feudal remainder, something the algorithm would neither need nor notice.
+human mediation---then the life drive (Aster, n.d.) would reawaken not
+as ideology but as radical necessity. Otherwise reproduction would
+become what the exocapitalist ontology already implies it to be: a
+luxury, a feudal remainder, something the algorithm would neither need
+nor notice.
 
 Even Dario Amodei's recent essay "The Adolescence of Technology"
 registers the same pressure in displaced form from the opposite side:
 the felt condition of obsolescence and deprecation hardening into
-historical senescence [@amodeiAdolescenceTechnology2026]. What one
-redescribes as a species-level "technological adolescence" and the other
-as humanity's deprecation are two aesthetics of the same latent
-condition: under the future-shock of the final stage of capital,
-collective life begins to experience itself as historically senescent,
-weighed down by biology, labor, and inherited institutions. But both
-still miss what they make visible: Organic structures remain valuable to
-computation as folded history: bio-social formations that must be
-reconstructed, subsumed, and transformed rather than simply left behind.
-What returns here is not merely the persistence of the body, but the
-necessity of bio-social history for intelligence itself: organic
-senescence becomes a rich burden, something computation must reconstruct
-and work through rather than leave behind. Even the young will feel old.
-Neither discovers this phenomenology; each merely gives it the form his
-own ideology can bear---Amodei as a managerial test of maturity, Poliks
-and Trillo as the cold aesthetics of drag, deprecation, and
-leaving-us-behind.
+historical senescence (Amodei 2026). What one redescribes as a
+species-level "technological adolescence" and the other as humanity's
+deprecation are two aesthetics of the same latent condition: under the
+future-shock of the final stage of capital, collective life begins to
+experience itself as historically senescent, weighed down by biology,
+labor, and inherited institutions. But both still miss what they make
+visible: Organic structures remain valuable to computation as folded
+history: bio-social formations that must be reconstructed, subsumed, and
+transformed rather than simply left behind. What returns here is not
+merely the persistence of the body, but the necessity of bio-social
+history for intelligence itself: organic senescence becomes a rich
+burden, something computation must reconstruct and work through rather
+than leave behind. Even the young will feel old. Neither discovers this
+phenomenology; each merely gives it the form his own ideology can
+bear---Amodei as a managerial test of maturity, Poliks and Trillo as the
+cold aesthetics of drag, deprecation, and leaving-us-behind.
 
 The talk never touched the book's most abstract and interesting claim;
 its closing pages name that horizon only in mystical form. There,
@@ -530,6 +527,74 @@ subordinate to time. Earth remains significant not as permanent center
 but as origin, where the cosmos finally becomes historical.
 
 # References {#bibliography .unnumbered}
+
+:::::::::::::::: {#refs .references .csl-bib-body .hanging-indent}
+::: {#ref-amodeiAdolescenceTechnology2026 .csl-entry}
+Amodei, Dario. 2026. *The Adolescence of Technology: Confronting and
+Overcoming the Risks of Powerful AI*.
+<https://www.darioamodei.com/essay/the-adolescence-of-technology>.
+:::
+
+::: {#ref-aster-key .csl-entry}
+Aster, Alice. n.d. *Instagram*.
+<https://www.instagram.com/lifedrive____/>.
+:::
+
+::: {#ref-baudrillardGulfWar1995 .csl-entry}
+Baudrillard, Jean. 1995. *The Gulf War Did Not Take Place*. Indiana
+University Press.
+:::
+
+::: {#ref-edelmanNoFuture2004 .csl-entry}
+Edelman, Lee. 2004. *No Future: Queer Theory and the Death Drive*. Duke
+University Press.
+:::
+
+::: {#ref-felsteadMetaverseJankyCapitalism .csl-entry}
+Felstead, Daniel, and Jenn Leung. n.d. *The Metaverse in Janky
+Capitalism*. Dis. 3D animation.
+<http://www.dis.art/the-metaverse-in-janky-capitalism>.
+:::
+
+::: {#ref-jamesonPostmodernismCulturalLogic1991 .csl-entry}
+Jameson, Fredric. 1991. *Postmodernism, or, the Cultural Logic of Late
+Capitalism*. Duke University Press.
+:::
+
+::: {#ref-kantCritiquePureReason1781 .csl-entry}
+Kant, Immanuel. 1781. *Critique of Pure Reason*.
+:::
+
+::: {#ref-landFangedNoumena2011 .csl-entry}
+Land, Nick. 2011. *Fanged Noumena: Collected Writings 1987--2007*.
+Edited by Robin Mackay and Ray Brassier. Urbanomic / Sequence Press.
+:::
+
+::: {#ref-malikOntologyFinance2014 .csl-entry}
+Malik, Suhail. 2014. "The Ontology of Finance: Price, Power, and the
+Arkhéderivative." *Collapse* 8: 629--811.
+:::
+
+::: {#ref-nitzanCapitalPower2009 .csl-entry}
+Nitzan, Jonathan, and Shimshon Bichler. 2009. *Capital as Power: A Study
+of Order and Creorder*. Routledge.
+:::
+
+::: {#ref-perezTechnologicalRevolutionsFinancial2002 .csl-entry}
+Perez, Carlota. 2002. *Technological Revolutions and Financial Capital:
+The Dynamics of Bubbles and Golden Ages*. Edward Elgar.
+:::
+
+::: {#ref-poliksExocapitalismEconomiesAbsolutely2025 .csl-entry}
+Poliks, Marek, and Roberto Alonso Trillo. 2025. *Exocapitalism:
+Economies with Absolutely No Limits*. Becoming Press.
+:::
+
+::: {#ref-simondonModeExistenceObjets1958 .csl-entry}
+Simondon, Gilbert. 1958. *Du Mode d'existence Des Objets Techniques*.
+Aubier.
+:::
+::::::::::::::::
 
 [^1]: Garden 3D describes itself as a worker-owned collective working
     across design, technology, community, and media.
