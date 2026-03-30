@@ -86,11 +86,10 @@ class TestMultiVersion:
 
 
 class TestIdempotency:
-    def test_skips_duplicate_version(self, tmp_publish_dir, registry_path):
+    def test_reregister_does_not_duplicate(self, tmp_publish_dir, registry_path):
         d = tmp_publish_dir(version="v1.0")
         run_update_registry(d, "test_essay", "v1.0", registry_path)
-        output = run_update_registry(d, "test_essay", "v1.0", registry_path)
-        assert "already registered" in output
+        run_update_registry(d, "test_essay", "v1.0", registry_path)
         reg = load_registry(registry_path)
         assert len(reg["essays"][0]["versions"]) == 1
 

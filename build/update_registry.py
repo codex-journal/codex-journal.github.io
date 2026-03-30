@@ -83,18 +83,21 @@ def main():
     if existing:
         versions = existing.get("versions", [])
 
-        # Check if this version already registered (immutable)
+        # Update existing version or append new
+        found = False
         for v in versions:
             if v.get("version") == version:
-                print(f"{args.essay_id} {version} already registered, skipping")
-                return
+                v["published_at"] = published_at
+                v["link"] = version_link
+                found = True
+                break
 
-        # Append new version
-        versions.append({
-            "version": version,
-            "published_at": published_at,
-            "link": version_link,
-        })
+        if not found:
+            versions.append({
+                "version": version,
+                "published_at": published_at,
+                "link": version_link,
+            })
 
         # Sort by published_at descending
         versions.sort(key=lambda v: v.get("published_at", ""), reverse=True)
