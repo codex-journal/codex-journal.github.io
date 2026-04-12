@@ -99,8 +99,8 @@ def main():
                 "link": version_link,
             })
 
-        # Sort by published_at descending
-        versions.sort(key=lambda v: v.get("published_at", ""), reverse=True)
+        # Sort by published_at descending, version name as tiebreaker
+        versions.sort(key=lambda v: (v.get("published_at", ""), v.get("version", "")), reverse=True)
         existing["versions"] = versions
 
         # Recompute top-level fields from latest version
