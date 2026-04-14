@@ -226,7 +226,7 @@ def copy_latest_to_root(essay_id):
             if not current:
                 return
             version_dir = PROJECT_ROOT / essay_id / current
-            for filename in ["index.html", "essay.md", "essay.epub"]:
+            for filename in ["index.html", "essay.md", "essay.epub", "history.json"]:
                 src = version_dir / filename
                 dst = PROJECT_ROOT / essay_id / filename
                 if src.exists():

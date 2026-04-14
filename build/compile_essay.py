@@ -55,10 +55,12 @@ def main():
 
     # Resolve markdown source (prefer "md" format artifact, fall back to first)
     md_artifact = None
+    history_artifact = None
     for art in doc["artifacts"]:
         if art.get("format") == "md":
             md_artifact = art["path"]
-            break
+        elif art.get("format") == "history":
+            history_artifact = art["path"]
     if not md_artifact:
         md_artifact = doc["artifacts"][0]["path"]
     md_path = publish_dir / md_artifact
@@ -179,6 +181,14 @@ def main():
             print(f"EPUB warning:\n{epub_result.stderr}", file=sys.stderr)
         else:
             print(f"  epub: {epub_out}", file=sys.stderr)
+
+        # Copy history.json if available
+        if history_artifact:
+            history_src = publish_dir / history_artifact
+            if history_src.exists():
+                history_out = output_dir / "history.json"
+                shutil.copy2(str(history_src), str(history_out))
+                print(f"  history: {history_out}", file=sys.stderr)
     finally:
         tmp_path.unlink(missing_ok=True)
 
