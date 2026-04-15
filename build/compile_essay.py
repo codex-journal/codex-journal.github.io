@@ -207,12 +207,13 @@ def main():
                 shutil.copy2(str(knots_src), str(knots_out))
                 print(f"  knots: {knots_out}", file=sys.stderr)
 
-        # Copy diff viewer if we have knots data
-        diff_viewer_src = build_dir / "diff-viewer.html"
-        if diff_viewer_src.exists():
-            diff_dir = output_dir / "diff"
-            diff_dir.mkdir(exist_ok=True)
-            shutil.copy2(str(diff_viewer_src), str(diff_dir / "index.html"))
+        # Copy viewer pages
+        for viewer_name, dir_name in [("diff-viewer.html", "diff"), ("flow-viewer.html", "flow")]:
+            viewer_src = build_dir / viewer_name
+            if viewer_src.exists():
+                viewer_dir = output_dir / dir_name
+                viewer_dir.mkdir(exist_ok=True)
+                shutil.copy2(str(viewer_src), str(viewer_dir / "index.html"))
     finally:
         tmp_path.unlink(missing_ok=True)
 

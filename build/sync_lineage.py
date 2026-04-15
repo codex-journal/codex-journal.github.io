@@ -232,7 +232,7 @@ def copy_latest_to_root(essay_id):
                 if src.exists():
                     shutil.copy2(str(src), str(dst))
             # Copy viewer directories
-            for viewer in ["history", "diff"]:
+            for viewer in ["history", "diff", "flow"]:
                 src_dir = version_dir / viewer
                 if src_dir.exists():
                     dst_dir = PROJECT_ROOT / essay_id / viewer
