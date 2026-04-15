@@ -44,8 +44,7 @@ leave to stochastic fluency.
 
 Before knots existed, the pressure was already visible in the raw draft
 form itself: One-sentence-per-line was already a sensible
-technical-writing practice
-[@groenenOneSentencePerLine; @kreeftmeijerOneSentencePerLine]; once the
+technical-writing practice (Groenen, n.d.; Kreeftmeijer, n.d.); once the
 writing process ran through an agent harness, those sentence boundaries
 needed stable local identity so the model could point, revise, move, and
 cite exact units without collapsing back into whole-document churn. That
@@ -327,11 +326,23 @@ program remains unfinished.
 ## Contact
 
 For now, access is best handled directly. Email:
-codexjournalinquiries@gmail.com. Instagram: @codexjournal. X:
-@sourceaware. Readers who want to inspect the code, try knots in its
-current state, or discuss the source engineering line are welcome to
+codexjournalinquiries@gmail.com. Instagram: (**codexjournal?**). X:
+(**sourceaware?**). Readers who want to inspect the code, try knots in
+its current state, or discuss the source engineering line are welcome to
 reach out there. The software is already usable, but the repository and
 contribution surface are still being reduced and clarified before a
 fuller public release.
 
 # References {#bibliography .unnumbered}
+
+::::: {#refs .references .csl-bib-body .hanging-indent}
+::: {#ref-groenenOneSentencePerLine .csl-entry}
+Groenen, Nick. n.d. *One Sentence Per Line*.
+<https://nick.groenen.me/notes/one-sentence-per-line/>.
+:::
+
+::: {#ref-kreeftmeijerOneSentencePerLine .csl-entry}
+Kreeftmeijer, Jeff. n.d. *One Sentence Per Line*.
+<https://jeffkreeftmeijer.com/one-sentence-per-line/>.
+:::
+:::::

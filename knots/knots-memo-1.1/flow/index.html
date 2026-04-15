@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>History Flow | Codex</title>
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a0f;
+  color: #ccc;
+  font-family: 'IBM Plex Mono', monospace;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.title-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  padding: 0.8rem 2rem;
+  font-size: 10px;
+  color: #444;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  z-index: 100;
+  background: rgba(10, 10, 15, 0.9);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.title-bar a { color: #666; text-decoration: none; }
+.title-bar a:hover { color: #daa520; }
+
+.legend {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 9px;
+  color: #666;
+}
+.legend span { display: flex; align-items: center; gap: 0.3rem; }
+.legend-swatch {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 2px;
+}
+
+.mode-toggle {
+  display: flex;
+  gap: 0.5rem;
+}
+.mode-toggle button {
+  font-family: inherit;
+  font-size: 9px;
+  background: none;
+  border: 1px solid #333;
+  color: #666;
+  padding: 0.15rem 0.5rem;
+  cursor: pointer;
+  border-radius: 2px;
+}
+.mode-toggle button:hover { border-color: #daa520; color: #daa520; }
+.mode-toggle button.active { background: #daa520; color: #0a0a0f; border-color: #daa520; }
+
+canvas { display: block; margin-top: 2.5rem; cursor: crosshair; }
+
+.tooltip {
+  position: fixed;
+  background: rgba(10, 10, 15, 0.95);
+  border: 1px solid #333;
+  padding: 0.6rem 0.8rem;
+  font-size: 10px;
+  color: #ccc;
+  max-width: 400px;
+  pointer-events: none;
+  z-index: 200;
+  display: none;
+  line-height: 1.6;
+}
+.tooltip .occ { color: #daa520; }
+.tooltip .content-preview { color: #999; font-style: italic; margin-top: 0.3rem; }
+.tooltip .state-info { color: #666; margin-top: 0.2rem; }
+</style>
+</head>
+<body>
+
+<div class="title-bar">
+  <span><a href="../">&larr; essay</a> &middot; history flow</span>
+  <div class="mode-toggle">
+    <button id="mode-agent" class="active">by agent</button>
+    <button id="mode-type">by type</button>
+    <button id="mode-age">by age</button>
+  </div>
+  <div class="legend" id="legend"></div>
+</div>
+
+<canvas id="canvas"></canvas>
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// ============================================================
+// State
+// ============================================================
+let historyData = null;
+let versionsData = null;
+let revisionMap = new Map();
+let snapshots = [];
+let hitRegions = [];
+let colorMode = 'agent';
+
+const AGENT_COLORS = {};
+const AGENT_PALETTE = ['#5cb85c', '#daa520', '#7d9bca', '#cc5500', '#9b59b6', '#e74c3c', '#1abc9c', '#f39c12'];
+let agentIdx = 0;
+
+function getAgentColor(agent) {
+  if (!AGENT_COLORS[agent]) {
+    AGENT_COLORS[agent] = AGENT_PALETTE[agentIdx % AGENT_PALETTE.length];
+    agentIdx++;
+  }
+  return AGENT_COLORS[agent];
+}
+
+const TYPE_COLORS = {
+  'h1': '#daa520', 'h2': '#cc5500', 'h3': '#9b59b6',
+  'p': '#333', 's': '#5cb85c',
+};
+
+// ============================================================
+// Load data
+// ============================================================
+async function loadData() {
+  const [histResp, versResp] = await Promise.all([
+    fetch('../history.json'),
+    fetch('../versions.json'),
+  ]);
+  historyData = await histResp.json();
+  versionsData = await versResp.json();
+
+  for (const r of historyData.revisions) {
+    revisionMap.set(r.revision_id, r);
+  }
+
+  // Sort transitions by event_id
+  historyData.transitions.sort((a, b) => a.event_id.localeCompare(b.event_id));
+}
+
+// ============================================================
+// Build snapshots at version boundaries
+// ============================================================
+function buildSnapshots() {
+  const transitions = historyData.transitions;
+  const versions = versionsData.versions.slice().sort(
+    (a, b) => (a.published_at || '').localeCompare(b.published_at || '')
+  );
+
+  // Find transition index closest to each version's published_at
+  const boundaries = [];
+  for (const v of versions) {
+    const ts = v.published_at || '';
+    let bestIdx = transitions.length - 1;
+    for (let i = 0; i < transitions.length; i++) {
+      if (transitions[i].ts > ts) {
+        bestIdx = Math.max(0, i - 1);
+        break;
+      }
+    }
+    boundaries.push({ version: v.version, transitionIdx: bestIdx, ts });
+  }
+
+  // Build document state at each boundary
+  const results = [];
+  const state = new Map(); // occ_id -> { revision_id, container, order_key, alive, agent }
+
+  let boundaryPtr = 0;
+  for (let i = 0; i < transitions.length; i++) {
+    const t = transitions[i];
+    const occ = state.get(t.occurrence_id) || {
+      revision_id: null, container: null, order_key: null, alive: false, agent: t.agent
+    };
+
+    switch (t.op) {
+      case 'place':
+        occ.revision_id = t.new_revision_id;
+        occ.container = t.new_container;
+        occ.order_key = t.new_order_key;
+        occ.alive = true;
+        occ.agent = t.agent;
+        break;
+      case 'retarget':
+        occ.revision_id = t.new_revision_id;
+        break;
+      case 'move':
+        occ.container = t.new_container;
+        occ.order_key = t.new_order_key;
+        break;
+      case 'remove':
+        occ.alive = false;
+        break;
+    }
+    state.set(t.occurrence_id, { ...occ });
+
+    // Check if we've reached a boundary
+    while (boundaryPtr < boundaries.length && i >= boundaries[boundaryPtr].transitionIdx) {
+      const b = boundaries[boundaryPtr];
+
+      // Collect live occurrences (skip paragraph containers)
+      const live = [];
+      for (const [occId, s] of state) {
+        if (!s.alive) continue;
+        const rev = revisionMap.get(s.revision_id);
+        if (!rev || rev.type === 'p') continue;
+        live.push({ occId, ...s, type: rev.type, content: rev.content });
+      }
+      live.sort((a, b) => {
+        if (a.container !== b.container) return a.container.localeCompare(b.container);
+        return a.order_key.localeCompare(b.order_key);
+      });
+
+      results.push({ version: b.version, ts: b.ts, live });
+      boundaryPtr++;
+    }
+  }
+
+  // If any remaining boundaries (shouldn't happen but safety)
+  while (boundaryPtr < boundaries.length) {
+    const b = boundaries[boundaryPtr];
+    const live = [];
+    for (const [occId, s] of state) {
+      if (!s.alive) continue;
+      const rev = revisionMap.get(s.revision_id);
+      if (!rev || rev.type === 'p') continue;
+      live.push({ occId, ...s, type: rev.type, content: rev.content });
+    }
+    live.sort((a, b) => {
+      if (a.container !== b.container) return a.container.localeCompare(b.container);
+      return a.order_key.localeCompare(b.order_key);
+    });
+    results.push({ version: b.version, ts: b.ts, live });
+    boundaryPtr++;
+  }
+
+  return results;
+}
+
+// ============================================================
+// Canvas rendering
+// ============================================================
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const tooltip = document.getElementById('tooltip');
+
+const COL_WIDTH = 140;
+const COL_GAP = 80;
+const BAND_MIN = 4;
+const BAND_MAX = 40;
+const MARGIN_TOP = 30;
+const MARGIN_LEFT = 40;
+const MARGIN_BOTTOM = 60;
+
+function getColor(occ, snapIdx) {
+  if (colorMode === 'agent') {
+    return getAgentColor(occ.agent);
+  } else if (colorMode === 'type') {
+    return TYPE_COLORS[occ.type] || '#666';
+  } else {
+    // Age: green=new, amber=old
+    const age = snapIdx / Math.max(1, snapshots.length - 1);
+    const r = Math.round(92 + age * 126);
+    const g = Math.round(184 - age * 19);
+    const b = Math.round(92 - age * 60);
+    return `rgb(${r},${g},${b})`;
+  }
+}
+
+function draw() {
+  const dpr = window.devicePixelRatio || 1;
+  const totalWidth = MARGIN_LEFT + snapshots.length * (COL_WIDTH + COL_GAP) + 40;
+  const maxHeight = window.innerHeight;
+
+  canvas.width = totalWidth * dpr;
+  canvas.height = maxHeight * dpr;
+  canvas.style.width = totalWidth + 'px';
+  canvas.style.height = maxHeight + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, totalWidth, maxHeight);
+  hitRegions = [];
+
+  // Compute max occurrences for band sizing
+  let maxOccs = 0;
+  for (const snap of snapshots) maxOccs = Math.max(maxOccs, snap.live.length);
+  const availH = maxHeight - MARGIN_TOP - MARGIN_BOTTOM - 20;
+  const bandH = Math.max(BAND_MIN, Math.min(BAND_MAX, Math.floor(availH / (maxOccs + 1))));
+  const bandGap = Math.max(1, Math.min(3, Math.floor(bandH / 8)));
+
+  const colPositions = [];
+
+  for (let i = 0; i < snapshots.length; i++) {
+    const snap = snapshots[i];
+    const x = MARGIN_LEFT + i * (COL_WIDTH + COL_GAP);
+    let y = MARGIN_TOP;
+
+    const bands = [];
+    for (const occ of snap.live) {
+      const color = getColor(occ, i);
+
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.85;
+      ctx.fillRect(x, y, COL_WIDTH, bandH);
+      ctx.globalAlpha = 1;
+
+      if (occ.type === 'h1' || occ.type === 'h2') {
+        ctx.strokeStyle = '#888';
+        ctx.lineWidth = 0.5;
+        ctx.strokeRect(x, y, COL_WIDTH, bandH);
+      }
+
+      bands.push({ occId: occ.occId, y, h: bandH, occ });
+      hitRegions.push({ x, y, w: COL_WIDTH, h: bandH, snapIdx: i, occ });
+
+      y += bandH + bandGap;
+    }
+    colPositions.push({ x, bands });
+
+    // Column label
+    ctx.fillStyle = '#daa520';
+    ctx.font = '11px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(snap.version, x + COL_WIDTH / 2, maxHeight - 35);
+    ctx.fillStyle = '#333';
+    ctx.font = '9px "IBM Plex Mono", monospace';
+    ctx.fillText(snap.live.length + ' blocks', x + COL_WIDTH / 2, maxHeight - 20);
+  }
+
+  // Draw flow connections
+  ctx.globalAlpha = 0.2;
+  for (let i = 1; i < colPositions.length; i++) {
+    const prev = colPositions[i - 1];
+    const curr = colPositions[i];
+
+    for (const cBand of curr.bands) {
+      const pBand = prev.bands.find(b => b.occId === cBand.occId);
+      if (!pBand) continue;
+
+      const x1 = prev.x + COL_WIDTH;
+      const y1 = pBand.y;
+      const h1 = pBand.h;
+      const x2 = curr.x;
+      const y2 = cBand.y;
+      const h2 = cBand.h;
+
+      const color = getColor(cBand.occ, i);
+      ctx.fillStyle = color;
+
+      const cx = (x1 + x2) / 2;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.bezierCurveTo(cx, y1, cx, y2, x2, y2);
+      ctx.lineTo(x2, y2 + h2);
+      ctx.bezierCurveTo(cx, y2 + h2, cx, y1 + h1, x1, y1 + h1);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+  ctx.globalAlpha = 1;
+
+  updateLegend();
+}
+
+function updateLegend() {
+  const legend = document.getElementById('legend');
+  let html = '';
+  if (colorMode === 'agent') {
+    for (const [agent, color] of Object.entries(AGENT_COLORS)) {
+      html += `<span><span class="legend-swatch" style="background:${color}"></span>${agent}</span>`;
+    }
+  } else if (colorMode === 'type') {
+    for (const [type, color] of Object.entries(TYPE_COLORS)) {
+      if (type === 'p') continue;
+      html += `<span><span class="legend-swatch" style="background:${color}"></span>${type}</span>`;
+    }
+  } else {
+    html = '<span><span class="legend-swatch" style="background:#5cb85c"></span>new</span>';
+    html += '<span><span class="legend-swatch" style="background:#daa520"></span>old</span>';
+  }
+  legend.innerHTML = html;
+}
+
+// ============================================================
+// Tooltip
+// ============================================================
+canvas.addEventListener('mousemove', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left + window.scrollX;
+  const my = e.clientY - rect.top;
+
+  let hit = null;
+  for (const r of hitRegions) {
+    if (mx >= r.x && mx <= r.x + r.w && my >= r.y && my <= r.y + r.h) {
+      hit = r;
+      break;
+    }
+  }
+
+  if (hit) {
+    const preview = hit.occ.content
+      ? hit.occ.content.substring(0, 120) + (hit.occ.content.length > 120 ? '...' : '')
+      : '';
+    const snap = snapshots[hit.snapIdx];
+
+    tooltip.innerHTML =
+      `<span class="occ">${hit.occ.occId.substring(0, 16)}</span> (${hit.occ.type})<br>` +
+      `agent: ${hit.occ.agent}<br>` +
+      `<div class="state-info">version: ${snap.version}</div>` +
+      `<div class="content-preview">${preview}</div>`;
+
+    tooltip.style.display = 'block';
+    tooltip.style.left = (e.clientX + 15) + 'px';
+    tooltip.style.top = (e.clientY + 15) + 'px';
+  } else {
+    tooltip.style.display = 'none';
+  }
+});
+
+canvas.addEventListener('mouseleave', () => {
+  tooltip.style.display = 'none';
+});
+
+// ============================================================
+// Mode toggles
+// ============================================================
+document.getElementById('mode-agent').addEventListener('click', () => setMode('agent'));
+document.getElementById('mode-type').addEventListener('click', () => setMode('type'));
+document.getElementById('mode-age').addEventListener('click', () => setMode('age'));
+
+function setMode(mode) {
+  colorMode = mode;
+  document.querySelectorAll('.mode-toggle button').forEach(b => b.classList.remove('active'));
+  document.getElementById('mode-' + mode).classList.add('active');
+  draw();
+}
+
+// ============================================================
+// Init
+// ============================================================
+async function init() {
+  await loadData();
+  snapshots = buildSnapshots();
+  draw();
+  window.addEventListener('resize', draw);
+}
+
+init();
+</script>
+</body>
+</html>

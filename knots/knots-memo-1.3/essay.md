@@ -28,12 +28,12 @@ quality depends less on surface fluency than on how well they hold
 together structurally.
 
 One-sentence-per-line was already a sensible technical-writing practice
-[@groenenOneSentencePerLine; @kreeftmeijerOneSentencePerLine]; once the
-writing process ran through an agent harness, those sentence boundaries
-needed stable local identity so the model could point, revise, move, and
-cite exact units without collapsing back into whole-document churn. That
-pressure was itself a smell: the problem had already become
-content-addressed before the tooling was willing to admit it.
+(Groenen, n.d.; Kreeftmeijer, n.d.); once the writing process ran
+through an agent harness, those sentence boundaries needed stable local
+identity so the model could point, revise, move, and cite exact units
+without collapsing back into whole-document churn. That pressure was
+itself a smell: the problem had already become content-addressed before
+the tooling was willing to admit it.
 
 I call the broader line source engineering: it treats source and
 artifact dialectically, as phases of a single compilation continuum
@@ -41,8 +41,8 @@ rather than as separate reified processes. That occlusion is structural:
 intellectual property is still secured in part by obscuring derivation
 itself.
 
-Pandoc [@MacFarlane_Pandoc] was a direct source of inspiration here: it
-made writing legible as a compilation and build pipeline with
+Pandoc (MacFarlane et al., n.d.) was a direct source of inspiration
+here: it made writing legible as a compilation and build pipeline with
 intermediate structure, transforms, and multiple output surfaces. That
 also made Haskell a plausible implementation language for knots, because
 the problem already looked typed and compiler-shaped.
@@ -77,10 +77,10 @@ pressed harder on that limit, because prose does not decompose cleanly
 into planned units of work: outlines carry too much implicit state, and
 local revision reorganizes the whole faster than a coordination graph
 can represent. That was also why C. L. R. James's Hegelian use of knots
-supplied the eventual name [@jamesNotesOnDialectics1948]. The problem
-was not files, nodes, or blocks, but local stabilizations of meaning,
-reference, and revision hardening out of multiplicity into points of
-arrest and direction.
+supplied the eventual name (James 1948). The problem was not files,
+nodes, or blocks, but local stabilizations of meaning, reference, and
+revision hardening out of multiplicity into points of arrest and
+direction.
 
 ## Failure
 
@@ -114,19 +114,17 @@ Recent empirical work on LLM-assisted writing points to the same failure
 from the artifact side: LLM revision workflows tend to flatten voice,
 shift stance, and steer distinct essays toward common semantic
 directions even when the task is framed as assistance rather than
-wholesale generation [@abdulhai2026llmsdistortwrittenlanguage]. That
-does not prove machine-mediated writing must work this way in principle,
-but it does show how quickly artifact-surface prompting produces the
-kind of distortion this system was built to prevent. The paper still
-studies an artifact contract rather than a source model, which is
-exactly the point: it can observe distortion at the rendered surface,
-but not preserve or audit the local transformations by which meaning
-changed.
+wholesale generation (Abdulhai et al. 2026). That does not prove
+machine-mediated writing must work this way in principle, but it does
+show how quickly artifact-surface prompting produces the kind of
+distortion this system was built to prevent. The paper still studies an
+artifact contract rather than a source model, which is exactly the
+point: it can observe distortion at the rendered surface, but not
+preserve or audit the local transformations by which meaning changed.
 
 ## Substrate
 
-Putting the repository in Postgres
-[@nesbittGitInPostgres2026; @hoganAgentsPostgresCodebase2026] does not
+Putting the repository in Postgres (Nesbitt 2026; Hogan 2026) does not
 solve deterministic replay, intent-level conflict semantics, or
 trustworthy reconstruction of historical state. The hard requirement is
 convergence under distributed writers with explicit causal evidence and
@@ -169,8 +167,8 @@ historical object and derives state by replay. Darcs and later Pijul are
 closer precedents here than Git, because they treat patches or changes
 as primary historical objects, reason explicitly about commutation and
 dependence, and represent conflict as part of the history rather than
-only as a failed merge against snapshots
-[@darcsMergersDocumentation; @darcsConflictors; @pijulWhyPijul].
+only as a failed merge against snapshots (D. Team, n.d.-b, n.d.-a; P.
+Team, n.d.).
 
 ## Claims
 
@@ -361,6 +359,58 @@ inspect the code, try knots in its current state, or discuss the source
 engineering line are welcome to reach out there.
 
 # References {#bibliography .unnumbered}
+
+::::::::::::: {#refs .references .csl-bib-body .hanging-indent}
+::: {#ref-abdulhai2026llmsdistortwrittenlanguage .csl-entry}
+Abdulhai, Marwa, Isadora White, Yanming Wan, et al. 2026. *How LLMs
+Distort Our Written Language*. <https://arxiv.org/abs/2603.18161>.
+:::
+
+::: {#ref-groenenOneSentencePerLine .csl-entry}
+Groenen, Nick. n.d. *One Sentence Per Line*.
+<https://nick.groenen.me/notes/one-sentence-per-line/>.
+:::
+
+::: {#ref-hoganAgentsPostgresCodebase2026 .csl-entry}
+Hogan, Sam. 2026. *Agents Writing Directly Against a Postgres-Backed
+Codebase*. <https://x.com/samhogan/status/2030476849911050687?s=20>.
+:::
+
+::: {#ref-jamesNotesOnDialectics1948 .csl-entry}
+James, C. L. R. 1948. *Notes on Dialectics: Hegel, Marx, Lenin*.
+<https://www.marxists.org/archive/james-clr/works/dialecti/index.htm>.
+:::
+
+::: {#ref-kreeftmeijerOneSentencePerLine .csl-entry}
+Kreeftmeijer, Jeff. n.d. *One Sentence Per Line*.
+<https://jeffkreeftmeijer.com/one-sentence-per-line/>.
+:::
+
+::: {#ref-MacFarlane_Pandoc .csl-entry}
+MacFarlane, John, Albert Krewinkel, and Jesse Rosenthal. n.d. *Pandoc*.
+<https://github.com/jgm/pandoc>.
+:::
+
+::: {#ref-nesbittGitInPostgres2026 .csl-entry}
+Nesbitt, Andrew. 2026. *Git in Postgres*.
+<https://nesbitt.io/2026/02/26/git-in-postgres.html>.
+:::
+
+::: {#ref-darcsConflictors .csl-entry}
+Team, Darcs. n.d.-a. *Conflictors*.
+<https://darcs.net/Theory/Conflictors>.
+:::
+
+::: {#ref-darcsMergersDocumentation .csl-entry}
+Team, Darcs. n.d.-b. *Mergers Documentation*.
+<https://darcs.net/Theory/MergersDocumentation>.
+:::
+
+::: {#ref-pijulWhyPijul .csl-entry}
+Team, Pijul. n.d. *Why Pijul*.
+<https://pijul.org/manual/why_pijul.html>.
+:::
+:::::::::::::
 
 [^1]: A concrete software-engineering symptom of this pressure appears
     in Steve Yegge's "The AI Vampire" (Feb. 11, 2026):
