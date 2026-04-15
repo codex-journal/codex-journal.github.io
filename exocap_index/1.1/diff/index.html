@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Version Diff | Codex</title>
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'EB Garamond', Georgia, serif;
+  background: #faf9f7;
+  color: #1a1a1a;
+}
+.controls {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: #fff;
+  border-bottom: 1px dotted #ccc;
+  padding: 0.8rem 2rem;
+  z-index: 100;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+.controls label { color: #888; }
+.controls select {
+  font-family: inherit;
+  font-size: 11px;
+  border: 1px dotted #ccc;
+  padding: 0.2rem 0.5rem;
+  background: #fff;
+}
+.container {
+  display: flex;
+  margin-top: 3rem;
+  gap: 0;
+}
+.version-col {
+  flex: 1;
+  padding: 2rem;
+  min-width: 0;
+  position: relative;
+}
+.version-col:first-child {
+  border-right: 1px dotted #ccc;
+}
+.version-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 1.5rem;
+}
+.knot-sentence {
+  display: inline;
+  line-height: 1.75;
+  font-size: 1.05rem;
+  transition: background 0.2s, color 0.2s;
+  cursor: default;
+  border-radius: 2px;
+  padding: 1px 0;
+}
+.knot-paragraph {
+  margin-bottom: 1.2em;
+  text-align: justify;
+  hyphens: auto;
+}
+.knot-heading {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dotted #ccc;
+}
+.knot-heading.h1 { font-size: 0.95rem; color: #333; }
+.knot-heading.h2 { font-size: 0.8rem; color: #555; }
+
+/* Diff states */
+.knot-sentence.unchanged { }
+.knot-sentence.modified {
+  background: #fff3cd;
+  text-decoration: underline;
+  text-decoration-color: #daa520;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+}
+.knot-sentence.added {
+  background: #d4edda;
+}
+.knot-sentence.removed {
+  background: #f8d7da;
+  text-decoration: line-through;
+  text-decoration-color: #c0392b;
+  color: #999;
+}
+.knot-sentence:hover {
+  outline: 1px solid #daa520;
+}
+.knot-sentence .sid {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px;
+  color: #ccc;
+  vertical-align: super;
+  margin-left: 2px;
+  user-select: none;
+}
+.knot-sentence:hover .sid {
+  color: #daa520;
+}
+
+/* SVG connector overlay */
+svg.connectors {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
+}
+svg.connectors path {
+  fill: none;
+  stroke: #daa520;
+  stroke-width: 1;
+  opacity: 0.3;
+}
+svg.connectors path.active {
+  stroke-width: 2;
+  opacity: 0.8;
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 10px;
+  color: #888;
+}
+.legend span {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.legend-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <a href="../" style="color:#888;text-decoration:none;margin-right:1rem">&larr; essay</a>
+  <label>LEFT: <select id="left-version"></select></label>
+  <label>RIGHT: <select id="right-version"></select></label>
+  <div class="legend">
+    <span><span class="legend-swatch" style="background:#fff3cd;border:1px dotted #daa520"></span> modified</span>
+    <span><span class="legend-swatch" style="background:#d4edda"></span> added</span>
+    <span><span class="legend-swatch" style="background:#f8d7da"></span> removed</span>
+  </div>
+</div>
+
+<svg class="connectors" id="connectors"></svg>
+
+<div class="container">
+  <div class="version-col" id="left-col">
+    <div class="version-label" id="left-label"></div>
+    <div id="left-content"></div>
+  </div>
+  <div class="version-col" id="right-col">
+    <div class="version-label" id="right-label"></div>
+    <div id="right-content"></div>
+  </div>
+</div>
+
+<script type="module">
+// --- Knots parser ---
+function parseKnots(text) {
+  const lines = text.split('\n');
+  const blocks = []; // { type: 'h1'|'h2'|'p', id, sentences: [{id, text}] }
+  let current = null;
+
+  for (const line of lines) {
+    const headingMatch = line.match(/^\[([0-9a-f]{4}):(h[1-3])\]\s*(.*)/);
+    if (headingMatch) {
+      current = {
+        type: headingMatch[2],
+        id: headingMatch[1],
+        sentences: [{ id: headingMatch[1], text: headingMatch[3] }]
+      };
+      blocks.push(current);
+      continue;
+    }
+
+    const paraMatch = line.match(/^\[([0-9a-f]{4}):p\]/);
+    if (paraMatch) {
+      current = { type: 'p', id: paraMatch[1], sentences: [] };
+      blocks.push(current);
+      continue;
+    }
+
+    const sentMatch = line.match(/^\s+\[([0-9a-f]{4}):s\]\s*(.*)/);
+    if (sentMatch && current) {
+      current.sentences.push({ id: sentMatch[1], text: sentMatch[2] });
+      continue;
+    }
+
+    // Continuation line
+    if (current && current.sentences.length > 0 && line.trim()) {
+      current.sentences[current.sentences.length - 1].text += ' ' + line.trim();
+    }
+  }
+  return blocks;
+}
+
+// --- Diff engine ---
+function diffVersions(leftBlocks, rightBlocks) {
+  // Build sentence maps: id -> text
+  const leftSentences = new Map();
+  const rightSentences = new Map();
+
+  for (const block of leftBlocks) {
+    for (const s of block.sentences) {
+      leftSentences.set(s.id, s.text);
+    }
+  }
+  for (const block of rightBlocks) {
+    for (const s of block.sentences) {
+      rightSentences.set(s.id, s.text);
+    }
+  }
+
+  // Classify each sentence
+  const leftStatus = new Map(); // id -> 'unchanged' | 'modified' | 'removed'
+  const rightStatus = new Map(); // id -> 'unchanged' | 'modified' | 'added'
+  const connections = []; // [{leftId, rightId, type}]
+
+  for (const [id, text] of leftSentences) {
+    if (rightSentences.has(id)) {
+      const rightText = rightSentences.get(id);
+      if (text === rightText) {
+        leftStatus.set(id, 'unchanged');
+        rightStatus.set(id, 'unchanged');
+      } else {
+        leftStatus.set(id, 'modified');
+        rightStatus.set(id, 'modified');
+      }
+      connections.push({ leftId: id, rightId: id, type: text === rightText ? 'unchanged' : 'modified' });
+    } else {
+      leftStatus.set(id, 'removed');
+    }
+  }
+
+  for (const [id] of rightSentences) {
+    if (!leftSentences.has(id)) {
+      rightStatus.set(id, 'added');
+    }
+  }
+
+  return { leftStatus, rightStatus, connections };
+}
+
+// --- Renderer ---
+function renderBlocks(container, blocks, statusMap, side) {
+  container.innerHTML = '';
+  for (const block of blocks) {
+    if (block.type.startsWith('h')) {
+      const el = document.createElement('div');
+      el.className = `knot-heading ${block.type}`;
+      el.textContent = block.sentences[0]?.text || '';
+      container.appendChild(el);
+    } else {
+      const p = document.createElement('p');
+      p.className = 'knot-paragraph';
+      for (const s of block.sentences) {
+        const span = document.createElement('span');
+        span.className = `knot-sentence ${statusMap.get(s.id) || 'unchanged'}`;
+        span.dataset.sid = s.id;
+        span.dataset.side = side;
+        // Strip citation syntax for display
+        span.textContent = s.text.replace(/@\w+/g, '').replace(/\[.*?\]/g, '').replace(/\s+/g, ' ').trim() + ' ';
+
+        const sidEl = document.createElement('span');
+        sidEl.className = 'sid';
+        sidEl.textContent = s.id;
+        span.appendChild(sidEl);
+
+        span.addEventListener('mouseenter', () => highlightPair(s.id));
+        span.addEventListener('mouseleave', () => clearHighlight());
+
+        p.appendChild(span);
+      }
+      container.appendChild(p);
+    }
+  }
+}
+
+// --- Connector lines ---
+function drawConnectors(connections) {
+  const svg = document.getElementById('connectors');
+  svg.innerHTML = '';
+  const svgNS = 'http://www.w3.org/2000/svg';
+
+  for (const conn of connections) {
+    if (conn.type === 'unchanged') continue; // Only draw modified connections
+
+    const leftEl = document.querySelector(`[data-sid="${conn.leftId}"][data-side="left"]`);
+    const rightEl = document.querySelector(`[data-sid="${conn.rightId}"][data-side="right"]`);
+    if (!leftEl || !rightEl) continue;
+
+    const lr = leftEl.getBoundingClientRect();
+    const rr = rightEl.getBoundingClientRect();
+
+    const x1 = lr.right;
+    const y1 = lr.top + lr.height / 2;
+    const x2 = rr.left;
+    const y2 = rr.top + rr.height / 2;
+
+    const cx1 = x1 + (x2 - x1) * 0.4;
+    const cx2 = x1 + (x2 - x1) * 0.6;
+
+    const path = document.createElementNS(svgNS, 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${cx1} ${y1}, ${cx2} ${y2}, ${x2} ${y2}`);
+    path.dataset.sid = conn.leftId;
+    svg.appendChild(path);
+  }
+}
+
+function highlightPair(sid) {
+  document.querySelectorAll(`[data-sid="${sid}"]`).forEach(el => {
+    if (el.tagName === 'path') {
+      el.classList.add('active');
+    } else {
+      el.style.outline = '2px solid #daa520';
+    }
+  });
+}
+
+function clearHighlight() {
+  document.querySelectorAll('.knot-sentence').forEach(el => el.style.outline = '');
+  document.querySelectorAll('svg path').forEach(el => el.classList.remove('active'));
+}
+
+// --- Data loading ---
+const versions = {};
+
+async function loadVersion(name, url) {
+  const resp = await fetch(url);
+  const text = await resp.text();
+  versions[name] = parseKnots(text);
+}
+
+async function init() {
+  // Determine essay root from URL: /essay_id/version/diff/ -> /essay_id/
+  const parts = location.pathname.replace(/\/+$/, '').split('/');
+  // parts: ['', essay_id, version, 'diff'] or ['', essay_id, 'diff']
+  const diffIdx = parts.indexOf('diff');
+  const essayRoot = parts.slice(0, diffIdx - (parts[diffIdx - 1] === parts[1] ? 0 : 1)).join('/') || '/';
+
+  // Load versions.json to discover available versions
+  const versionsResp = await fetch(essayRoot + '/versions.json');
+  const versionsData = await versionsResp.json();
+  const available = versionsData.versions.map(v => v.version);
+
+  // Load knots.md for each version
+  await Promise.all(available.map(v =>
+    loadVersion(v, `${essayRoot}/${v}/essay.knots.md`).catch(() => {})
+  ));
+
+  const versionNames = Object.keys(versions).sort();
+
+  // Populate dropdowns
+  const leftSel = document.getElementById('left-version');
+  const rightSel = document.getElementById('right-version');
+  for (const v of versionNames) {
+    leftSel.add(new Option(v, v));
+    rightSel.add(new Option(v, v));
+  }
+  leftSel.value = versionNames[0];
+  rightSel.value = versionNames[versionNames.length - 1];
+
+  function update() {
+    const lv = leftSel.value;
+    const rv = rightSel.value;
+
+    document.getElementById('left-label').textContent = `v${lv}`;
+    document.getElementById('right-label').textContent = `v${rv}`;
+
+    const diff = diffVersions(versions[lv], versions[rv]);
+    renderBlocks(document.getElementById('left-content'), versions[lv], diff.leftStatus, 'left');
+    renderBlocks(document.getElementById('right-content'), versions[rv], diff.rightStatus, 'right');
+
+    requestAnimationFrame(() => drawConnectors(diff.connections));
+  }
+
+  leftSel.addEventListener('change', update);
+  rightSel.addEventListener('change', update);
+  window.addEventListener('resize', () => requestAnimationFrame(() => {
+    const lv = leftSel.value, rv = rightSel.value;
+    const diff = diffVersions(versions[lv], versions[rv]);
+    drawConnectors(diff.connections);
+  }));
+  window.addEventListener('scroll', () => requestAnimationFrame(() => {
+    const lv = leftSel.value, rv = rightSel.value;
+    const diff = diffVersions(versions[lv], versions[rv]);
+    drawConnectors(diff.connections);
+  }));
+
+  update();
+}
+
+init();
+</script>
+</body>
+</html>
