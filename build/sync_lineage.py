@@ -231,6 +231,13 @@ def copy_latest_to_root(essay_id):
                 dst = PROJECT_ROOT / essay_id / filename
                 if src.exists():
                     shutil.copy2(str(src), str(dst))
+            # Copy history viewer directory
+            history_dir = version_dir / "history"
+            if history_dir.exists():
+                dst_history = PROJECT_ROOT / essay_id / "history"
+                if dst_history.exists():
+                    shutil.rmtree(str(dst_history))
+                shutil.copytree(str(history_dir), str(dst_history))
             print(f"  latest: {current} -> {PROJECT_ROOT / essay_id}/")
             return
 

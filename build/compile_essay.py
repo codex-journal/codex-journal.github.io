@@ -182,12 +182,18 @@ def main():
         else:
             print(f"  epub: {epub_out}", file=sys.stderr)
 
-        # Copy history.json if available
+        # Copy history.json and viewer if available
         if history_artifact:
             history_src = publish_dir / history_artifact
             if history_src.exists():
                 history_out = output_dir / "history.json"
                 shutil.copy2(str(history_src), str(history_out))
+                # Copy history viewer
+                viewer_src = build_dir / "history-viewer.html"
+                if viewer_src.exists():
+                    viewer_dir = output_dir / "history"
+                    viewer_dir.mkdir(exist_ok=True)
+                    shutil.copy2(str(viewer_src), str(viewer_dir / "index.html"))
                 print(f"  history: {history_out}", file=sys.stderr)
     finally:
         tmp_path.unlink(missing_ok=True)
