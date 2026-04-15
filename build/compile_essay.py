@@ -56,11 +56,14 @@ def main():
     # Resolve markdown source (prefer "md" format artifact, fall back to first)
     md_artifact = None
     history_artifact = None
+    knots_md_artifact = None
     for art in doc["artifacts"]:
         if art.get("format") == "md":
             md_artifact = art["path"]
         elif art.get("format") == "history":
             history_artifact = art["path"]
+        elif art.get("format") == "knots_md":
+            knots_md_artifact = art["path"]
     if not md_artifact:
         md_artifact = doc["artifacts"][0]["path"]
     md_path = publish_dir / md_artifact
@@ -195,6 +198,21 @@ def main():
                     viewer_dir.mkdir(exist_ok=True)
                     shutil.copy2(str(viewer_src), str(viewer_dir / "index.html"))
                 print(f"  history: {history_out}", file=sys.stderr)
+
+        # Copy .knots.md if available
+        if knots_md_artifact:
+            knots_src = publish_dir / knots_md_artifact
+            if knots_src.exists():
+                knots_out = output_dir / "essay.knots.md"
+                shutil.copy2(str(knots_src), str(knots_out))
+                print(f"  knots: {knots_out}", file=sys.stderr)
+
+        # Copy diff viewer if we have knots data
+        diff_viewer_src = build_dir / "diff-viewer.html"
+        if diff_viewer_src.exists():
+            diff_dir = output_dir / "diff"
+            diff_dir.mkdir(exist_ok=True)
+            shutil.copy2(str(diff_viewer_src), str(diff_dir / "index.html"))
     finally:
         tmp_path.unlink(missing_ok=True)
 

@@ -226,18 +226,19 @@ def copy_latest_to_root(essay_id):
             if not current:
                 return
             version_dir = PROJECT_ROOT / essay_id / current
-            for filename in ["index.html", "essay.md", "essay.epub", "history.json"]:
+            for filename in ["index.html", "essay.md", "essay.epub", "history.json", "essay.knots.md"]:
                 src = version_dir / filename
                 dst = PROJECT_ROOT / essay_id / filename
                 if src.exists():
                     shutil.copy2(str(src), str(dst))
-            # Copy history viewer directory
-            history_dir = version_dir / "history"
-            if history_dir.exists():
-                dst_history = PROJECT_ROOT / essay_id / "history"
-                if dst_history.exists():
-                    shutil.rmtree(str(dst_history))
-                shutil.copytree(str(history_dir), str(dst_history))
+            # Copy viewer directories
+            for viewer in ["history", "diff"]:
+                src_dir = version_dir / viewer
+                if src_dir.exists():
+                    dst_dir = PROJECT_ROOT / essay_id / viewer
+                    if dst_dir.exists():
+                        shutil.rmtree(str(dst_dir))
+                    shutil.copytree(str(src_dir), str(dst_dir))
             print(f"  latest: {current} -> {PROJECT_ROOT / essay_id}/")
             return
 
