@@ -436,6 +436,175 @@ hr {
     }
 }
 
+/* --- Product Landing Pages --- */
+
+.product-page {
+    max-width: 56rem;
+}
+
+.product-hero {
+    padding: 2.5rem 0 1rem 0;
+}
+
+.product-kicker,
+.product-section-label,
+.product-card-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #888;
+}
+
+.product-kicker {
+    margin-bottom: 1rem;
+}
+
+.product-lede {
+    max-width: 42rem;
+    font-family: 'EB Garamond', 'Georgia', serif;
+    font-size: 1.45rem;
+    line-height: 1.55;
+    color: #222;
+}
+
+.product-note {
+    font-size: 11px;
+    color: #888;
+    letter-spacing: 0.02em;
+}
+
+.product-inline-code {
+    font-family: 'IBM Plex Mono', monospace;
+    color: #444;
+}
+
+.product-cta-row {
+    display: flex;
+    gap: 0.9rem;
+    flex-wrap: wrap;
+    margin: 1.5rem 0 0.8rem 0;
+}
+
+.product-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.8rem 1.15rem;
+    border: 1px solid #111;
+    color: #111;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    background: transparent;
+}
+
+.product-button:hover {
+    background: #111;
+    color: #fafafa;
+    text-decoration: none;
+}
+
+.product-button-primary {
+    background: #111;
+    color: #fafafa;
+}
+
+.product-button-primary:hover {
+    background: #7d9bca;
+    border-color: #7d9bca;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 2rem 0 3rem 0;
+}
+
+.product-card,
+.product-list-card,
+.product-cta-panel {
+    border: 1px dotted #bbb;
+    padding: 1.2rem;
+    background: rgba(255, 255, 255, 0.75);
+}
+
+.product-card h2,
+.product-list-card h3,
+.product-cta-panel h2 {
+    margin-top: 0.2rem;
+}
+
+.product-section {
+    padding: 1.1rem 0 2rem 0;
+    border-top: 1px dotted #ccc;
+}
+
+.product-section-compact {
+    padding-bottom: 0;
+}
+
+.product-split {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: 2rem;
+    align-items: start;
+}
+
+.product-quote {
+    margin: 0 0 1.25rem 0;
+    padding-left: 1rem;
+    border-left: 2px solid #7d9bca;
+    font-family: 'EB Garamond', 'Georgia', serif;
+    font-size: 1.35rem;
+    line-height: 1.5;
+    color: #222;
+}
+
+.product-list-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.product-list {
+    margin: 0;
+    padding-left: 1.1rem;
+}
+
+.product-list li {
+    margin-bottom: 0.65rem;
+}
+
+.product-cta-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(16rem, 0.8fr);
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.product-cta-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    font-size: 13px;
+}
+
+@media (max-width: 900px) {
+    .product-grid,
+    .product-list-grid,
+    .product-split,
+    .product-cta-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .product-lede,
+    .product-quote {
+        font-size: 1.2rem;
+    }
+}
+
 @media (max-width: 600px) {
     .site-container {
         padding: 1rem;
@@ -460,5 +629,13 @@ hr {
 
     h1 {
         font-size: 1.2rem;
+    }
+
+    .product-cta-row {
+        flex-direction: column;
+    }
+
+    .product-button {
+        width: 100%;
     }
 }
